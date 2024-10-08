@@ -29,7 +29,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/health", (req, res) => {
-  res.send("Server health is fine and good");
+  res.send("Server health is good");
 });
 
 // MARK: GLOBAL MIDDLEWARES
