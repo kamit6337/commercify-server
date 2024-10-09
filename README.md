@@ -49,7 +49,7 @@ To run this server locally using Docker Image :
 - install Docker Desktop from [Docker website](https://www.docker.com/products/docker-desktop) and start to run in background
 - create a folder in desktop, open this folder in VS Code
 - create a .env file
-- copy .env.example file variables from above and paste in .env file
+- copy /server/.env.example file variables from above and paste in .env file
 - start filling all environment variables
 ### All environment variables is necessary except EXPIRES_IN, SENTRY_DSN, REDIS_URL to run smoothly and see all functionality
 - also create a compose.yaml file inside that folder
