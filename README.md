@@ -51,7 +51,6 @@ To run this server locally using Docker Image :
 - create a .env file
 - copy /server/.env.example file variables from above and paste in .env file
 - start filling all environment variables
-### All environment variables is necessary except EXPIRES_IN, SENTRY_DSN, REDIS_URL to run smoothly and see all functionality
 - also create a compose.yaml file inside that folder
 - copy below code and paste in compose.yaml
 
