@@ -7,7 +7,7 @@ export const environment = {
   MONGO_DB_URI: process.env.MONGO_DB_URI,
   CLIENT_URL: process.env.CLIENT_URL,
   JWT_SECRET_KEY: process.env.JWT_SECRET_KEY,
-  JWT_EXPIRES_IN: Number(process.env.JWT_EXPIRES_IN),
+  JWT_EXPIRES_IN: Number(process.env.JWT_EXPIRES_IN) || 2592000000,
   TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID,
   TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN,
   TWILIO_SERVICE_SID: process.env.TWILIO_SERVICE_SID,
