@@ -82,7 +82,7 @@ services:
 ```
 
 
-- open VS Code terminal (Ctrl + `)
+- open VS Code terminal (Ctrl + ` )
 
 ```
 docker compose up
