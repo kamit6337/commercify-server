@@ -2,6 +2,8 @@
 
 <p>It's a Full Stack e-Commerce Web App build in MERN Stack including Stripe payment integartion</p>
 
+[Preview](https://amit-general-bucket.s3.ap-south-1.amazonaws.com/videos/commercify.mp4)
+
 Docker Image : [kamit6337/commercify-server](https://hub.docker.com/repository/docker/kamit6337/commercify-server/general)
 
 ## Table of Contents
@@ -49,9 +51,8 @@ To run this server locally using Docker Image :
 - install Docker Desktop from [Docker website](https://www.docker.com/products/docker-desktop) and start to run in background
 - create a folder in desktop, open this folder in VS Code
 - create a .env file
-- copy .env.example file variables from above and paste in .env file
+- copy /server/.env.example file variables from above and paste in .env file
 - start filling all environment variables
-### All environment variables is necessary except EXPIRES_IN, SENTRY_DSN, REDIS_URL to run smoothly and see all functionality
 - also create a compose.yaml file inside that folder
 - copy below code and paste in compose.yaml
 
@@ -83,7 +84,7 @@ services:
 ```
 
 
-- open VS Code terminal (Ctrl + `)
+- open VS Code terminal (Ctrl + ` )
 
 ```
 docker compose up
