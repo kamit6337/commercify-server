@@ -1,6 +1,8 @@
 import { Redis } from "ioredis";
 import { environment } from "../utils/environment.js";
 
+console.log("Redis url", environment.REDIS_URL);
+
 const redisClient = new Redis(
   environment.REDIS_URL || {
     host: "redis",
