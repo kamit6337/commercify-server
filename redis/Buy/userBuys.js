@@ -1,5 +1,13 @@
 import redisClient from "../redisClient.js";
 
+export const getSingleBuyFromRedis = async (buyId) => {
+  if (!buyId) return null;
+
+  const get = await redisClient.get(`Buy:${buyId}`);
+
+  return get ? JSON.parse(get) : null;
+};
+
 export const getUserBuysRedis = async (userId, page, limit) => {
   if (!userId || !page || !limit) {
     throw new Error("UserId or Page or Limit are not provided");
@@ -58,6 +66,8 @@ export const setSingleUserBuyRedis = async (userId, buy) => {
 };
 
 export const updateUserBuysRedis = async (buy) => {
+  if (!buy) return;
+
   const get = await redisClient.get(`Buy:${buy._id.toString()}`);
 
   if (!get) return null;

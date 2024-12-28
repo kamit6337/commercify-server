@@ -10,6 +10,7 @@ import addressRouter from "./routes/addressRoutes.js";
 import paymentRouter from "./routes/paymentRoutes.js";
 import stripeRouter from "./routes/stripeRoutes.js";
 import searchRouter from "./routes/searchRoutes.js";
+import additionalRouter from "./routes/additionalRoutes.js";
 import globalErrorHandler from "./middlewares/globalErrorHandler.js";
 import globalMiddlewares from "./middlewares/globalMiddlewares.js";
 import protectRoute from "./middlewares/protectRoute.js";
@@ -47,6 +48,7 @@ app.use("/buy", protectRoute, buyRouter);
 app.use("/payment", protectRoute, paymentRouter);
 app.use("/stripe", stripeRouter);
 app.use("/search", searchRouter);
+app.use("/additional", additionalRouter);
 
 // NOTE: UNIDENTIFIED ROUTES
 app.all("*", unidentifiedError);

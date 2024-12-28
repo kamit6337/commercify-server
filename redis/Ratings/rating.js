@@ -1,5 +1,12 @@
 import redisClient from "../redisClient.js";
 
+export const getSingleRatingFromRedis = async (ratingId) => {
+  if (!ratingId) return null;
+
+  const get = await redisClient.get(`Ratings:${ratingId}`);
+  return get ? JSON.parse(get) : null;
+};
+
 // NOTE: GET PRODUCT RATINGS WITH PAGINATION
 export const getProductRatingsRedis = async (productId, page, limit) => {
   if (!productId || !page || !limit) return null;

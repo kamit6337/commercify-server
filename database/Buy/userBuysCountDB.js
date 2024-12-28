@@ -4,7 +4,7 @@ import {
   setUserBuysCountRedis,
 } from "../../redis/Buy/userBuysCount.js";
 
-const userBuysDetailDB = async (userId) => {
+const userBuysCountDB = async (userId) => {
   const get = await getUserBuysCountRedis(userId);
   if (get) return get;
 
@@ -15,4 +15,4 @@ const userBuysDetailDB = async (userId) => {
   return countBuys;
 };
 
-export default userBuysDetailDB;
+export default userBuysCountDB;

@@ -10,9 +10,9 @@ import {
 } from "../../../redis/Auth/signUp.js";
 
 const signup = catchAsyncError(async (req, res, next) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, dial_code, mobile } = req.body;
 
-  if (!name || !email || !password) {
+  if (!name || !email || !password || !dial_code || !mobile) {
     return next(new HandleGlobalError("Not provided all field", 404));
   }
 
@@ -37,6 +37,8 @@ const signup = catchAsyncError(async (req, res, next) => {
     name,
     email,
     password,
+    dial_code,
+    mobile,
   };
   await setUserSignupDataIntoRedis(email, obj);
 

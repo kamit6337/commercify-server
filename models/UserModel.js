@@ -19,6 +19,14 @@ const userSchema = new mongoose.Schema({
       message: (props) => `${props.value} is not a valid email`,
     },
   },
+  dial_code: {
+    type: String,
+    required: [true, "Dial Code is not provided"],
+  },
+  mobile: {
+    type: String,
+    required: [true, "Mobile number is not provided"],
+  },
   password: {
     type: String,
     default: "",

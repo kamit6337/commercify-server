@@ -24,7 +24,7 @@ const verifySignup = catchAsyncError(async (req, res, next) => {
     );
   }
 
-  const { name, password } = userData;
+  const { name, password, dial_code, mobile } = userData;
 
   const profilePicUrl = `https://ui-avatars.com/api/?background=random&name=${name}&size=128&bold=true`;
 
@@ -33,6 +33,8 @@ const verifySignup = catchAsyncError(async (req, res, next) => {
     email,
     password,
     photo: profilePicUrl,
+    dial_code,
+    mobile,
   };
 
   const createUser = await postCreateUser(obj);

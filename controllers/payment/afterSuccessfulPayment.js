@@ -1,26 +1,17 @@
 import catchAsyncError from "../../lib/catchAsyncError.js";
-import Buy from "../../models/BuyModel.js";
 import HandleGlobalError from "../../lib/HandleGlobalError.js";
+import buysFromSessionID from "../../database/Buy/buysFromSessionID.js";
 
 const afterSuccessfulPayment = catchAsyncError(async (req, res, next) => {
-  const { sessionId } = req.query;
+  const { cartSessionId } = req.query;
 
-  if (!sessionId) {
+  if (!cartSessionId) {
     return next(new HandleGlobalError("Please provide ID", 404));
   }
 
-  const products = await Buy.find({
-    sessionId,
-  })
-    .populate("product")
-    .populate("address")
-    .lean()
-    .sort("+createdAt");
+  const products = await buysFromSessionID(cartSessionId);
 
-  res.status(200).json({
-    message: "Payment Successful",
-    data: products,
-  });
+  res.json(products);
 });
 
 export default afterSuccessfulPayment;

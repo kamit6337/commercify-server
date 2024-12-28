@@ -29,4 +29,9 @@ export const environment = {
   AWS_S3_BUCKET: process.env.AWS_S3_BUCKET,
 
   REDIS_URL: process.env.REDIS_URL,
+
+  CURRENCY_EXCHANGE_KEY: process.env.CURRENCY_EXCHANGE_KEY,
+  COUNTRY_KEY_EMAIL: process.env.COUNTRY_KEY_EMAIL,
+  COUNTRY_KEY: process.env.COUNTRY_KEY,
+  GEOLOCATION_APIKEY: process.env.GEOLOCATION_APIKEY,
 };
