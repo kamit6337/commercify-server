@@ -11,7 +11,6 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    needs: test-and-build # Ensures this job runs only after tests pass
 
     steps:
       - name: Checkout repository
@@ -24,7 +23,7 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
       - name: Build the Docker image
-        run: docker build -t kamit6337/nodejs-template:latest ./server
+        run: docker build -t kamit6337/commercify-server:latest .
 
       - name: Push the Docker image to Docker Hub
-        run: docker push kamit6337/nodejs-template:latest
+        run: docker push kamit6337/commercify-server:latest
