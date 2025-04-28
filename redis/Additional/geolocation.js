@@ -22,13 +22,9 @@ export const getCountryFromLanLonFromRedis = async (
     return null; // No nearby locations found
   }
 
-  console.log("nearbyLocations", nearbyLocations);
-
   // Fetch detailed data for the first nearby location
   const id = nearbyLocations[0]; // Choose the closest match
   const countryInfo = await redisClient.get(`CountryInfo:${id}`);
-
-  console.log("countryInfo", countryInfo);
 
   return countryInfo ? JSON.parse(countryInfo) : null;
 };
