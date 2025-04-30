@@ -38,6 +38,8 @@ export const setCountryFromlanLonIntoRedis = async (lat, lon, data) => {
   // Add the location to the Redis geospatial set
   await redisClient.geoadd(key, lon, lat, id);
 
+  await redisClient.expire(key, 60 * 60 * 24);
+
   // Store the country info in a separate key
   await redisClient.set(
     `CountryInfo:${id}`,
