@@ -5,6 +5,7 @@ import Address from "../../models/AddressModel.js";
 import connectToDB from "../../lib/connectToDB.js";
 import getAddressByID from "../../database/Address/getAddressByID.js";
 import createNewBuyDB from "../../database/Buy/createNewBuyDB.js";
+import createBuyAddressDB from "../../database/Address/createBuyAddressDB.js";
 
 const Stripe = stripe(environment.STRIPE_SECRET_KEY);
 const webhookSecretKey = environment.STRIPE_WEBHOOK_SECRET_KEY;
@@ -35,6 +36,8 @@ const webhookCheckout = catchAsyncError(async (request, response) => {
     orderId,
   } = JSON.parse(metadata.willBuyProducts);
 
+  console.log("webhook checkout");
+
   await connectToDB();
 
   const findAddress = await getAddressByID(addressId);
@@ -42,7 +45,7 @@ const webhookCheckout = catchAsyncError(async (request, response) => {
   const { name, mobile, address, district, state, country, dial_code } =
     findAddress;
 
-  const addNewAddress = await Address.create({
+  const addressObj = {
     name,
     mobile: Number(mobile),
     address,
@@ -50,7 +53,9 @@ const webhookCheckout = catchAsyncError(async (request, response) => {
     country,
     dial_code,
     state,
-  });
+  };
+
+  const addNewAddress = await createBuyAddressDB(addressObj);
 
   await Promise.all(
     products.map(async (product) => {

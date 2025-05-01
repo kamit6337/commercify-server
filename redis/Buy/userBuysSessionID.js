@@ -1,13 +1,9 @@
 import redisClient from "../redisClient.js";
 
-export const getUserBuysBySessionID = async (sessionId) => {
-  if (!sessionId) return null;
+export const getUserBuysBySessionID = async (orderId) => {
+  if (!orderId) return null;
 
-  const buyIds = await redisClient.zrevrange(
-    `Buys-SessionId:${sessionId}`,
-    0,
-    -1
-  );
+  const buyIds = await redisClient.zrevrange(`Buys-OrderId:${orderId}`, 0, -1);
 
   if (!buyIds || buyIds.length === 0) return null;
 
@@ -20,9 +16,9 @@ export const getUserBuysBySessionID = async (sessionId) => {
   return buys.map((buy) => JSON.parse(buy));
 };
 
-export const setUserBuysBySessionID = async (sessionId, buys) => {
-  if (!sessionId || !buys.length) {
-    throw new Error("sessionId or Buys is not provided");
+export const setUserBuysBySessionID = async (orderId, buys) => {
+  if (!orderId || !buys.length) {
+    throw new Error("orderId or Buys is not provided");
   }
 
   const multi = redisClient.multi();
@@ -31,11 +27,25 @@ export const setUserBuysBySessionID = async (sessionId, buys) => {
     const newDate = new Date(buy.createdAt);
     const score = newDate.getTime();
 
-    multi.zadd(`Buys-SessionId:${sessionId}`, score, buy._id);
+    multi.zadd(`Buys-OrderId:${orderId}`, score, buy._id);
 
     multi.set(`Buy:${buy._id}`, JSON.stringify(buy), "EX", 3600);
   }
 
-  multi.expire(`Buys-SessionId:${sessionId}`, 3600);
+  multi.expire(`Buys-OrderId:${orderId}`, 3600);
   await multi.exec();
+};
+
+export const setUserSingleBuyByOrderId = async (orderId, buy) => {
+  if (!orderId || !buy) {
+    throw new Error("orderId or Buy is not provided");
+  }
+
+  const newDate = new Date(buy.createdAt);
+  const score = newDate.getTime();
+
+  await redisClient.zadd(`Buys-OrderId:${orderId}`, score, buy._id);
+  await redisClient.expire(`Buys-OrderId:${orderId}`, 3600);
+
+  await redisClient.set(`Buy:${buy._id}`, JSON.stringify(buy), "EX", 3600);
 };

@@ -7,6 +7,7 @@ import dateInMilli from "../../utils/javaScript/dateInMilli.js";
 import generateSecureString from "../../utils/javaScript/generateSecureString.js";
 import getAddressByID from "../../database/Address/getAddressByID.js";
 import getProductsFromIdsDB from "../../database/Products/getProductsFromIdsDB.js";
+import getExchange from "../additional/getExchange.js";
 
 const Stripe = stripe(environment.STRIPE_SECRET_KEY);
 
@@ -15,16 +16,18 @@ const makePaymentSession = catchAsyncError(async (req, res, next) => {
   const userId = req.userId;
   const CHECKOUT_ORDER_ID = generateSecureString();
 
-  const { products, address: addressId, code, exchangeRate, symbol } = req.body;
+  const { products, address: addressId, code, symbol } = req.body;
 
-  if (!products || !addressId || !code || !exchangeRate || !symbol) {
+  if (!products || !addressId || !code || !symbol) {
     return next(new HandleGlobalError("Not provide all fields", 404));
   }
+
+  const allExchange = await getExchange();
+  const exchangeRate = allExchange[code];
 
   const findAddress = await getAddressByID(addressId);
 
   const productIds = products.map((obj) => obj.id);
-
   const findProducts = await getProductsFromIdsDB(productIds);
 
   const willBuyProducts = {
@@ -45,11 +48,13 @@ const makePaymentSession = catchAsyncError(async (req, res, next) => {
     } = product;
 
     const findQuantity = products.find((obj) => obj.id === String(_id));
-    const { discountedPrice } = changePriceDiscountByExchangeRate(
-      price,
-      discountPercentage,
-      exchangeRate
-    );
+
+    const { discountedPrice, exchangeRatePrice, roundDiscountPercent } =
+      changePriceDiscountByExchangeRate(
+        price,
+        discountPercentage,
+        exchangeRate
+      );
 
     const discountedPriceWithoutExchangeRate =
       (price * (100 - Math.trunc(discountPercentage))) / 100;
