@@ -13,6 +13,9 @@ const webhookSecretKey = environment.STRIPE_WEBHOOK_SECRET_KEY;
 const webhookCheckout = catchAsyncError(async (request, response) => {
   const sig = request.headers["stripe-signature"];
 
+  console.log("Stripe", Stripe);
+  console.log("webhookSecretKey", webhookSecretKey);
+
   let event;
   try {
     event = Stripe.webhooks.constructEvent(request.body, sig, webhookSecretKey);
@@ -21,7 +24,7 @@ const webhookCheckout = catchAsyncError(async (request, response) => {
     return;
   }
 
-  console.log("event type", eventType);
+  console.log("event type", event);
 
   // Handle the event
   if (event.type !== "checkout.session.completed") {
