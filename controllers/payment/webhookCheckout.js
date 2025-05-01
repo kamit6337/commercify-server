@@ -21,6 +21,8 @@ const webhookCheckout = catchAsyncError(async (request, response) => {
     return;
   }
 
+  console.log("event type", eventType);
+
   // Handle the event
   if (event.type !== "checkout.session.completed") {
     response.send("Error occur");
@@ -36,7 +38,7 @@ const webhookCheckout = catchAsyncError(async (request, response) => {
     orderId,
   } = JSON.parse(metadata.willBuyProducts);
 
-  console.log("webhook checkout");
+  console.log("webhook checkout", metadata);
 
   await connectToDB();
 
