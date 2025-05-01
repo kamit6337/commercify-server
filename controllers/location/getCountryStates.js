@@ -6,44 +6,58 @@ import {
   setCountryStatesIntoRedis,
 } from "../../redis/Location/countryStates.js";
 import getLocationKey from "./getLocationKey.js";
+import getStatesAndCities from "../../lib/getStatesAndCities.js";
 
 const URL = "https://www.universal-tutorial.com/api/states/";
 
 const getCountryStates = catchAsyncError(async (req, res, next) => {
-  const { country } = req.query;
+  const { country, code } = req.query;
 
-  if (!country) {
+  if (!country || !code) {
     return next(new HandleGlobalError("Country is not provided"));
   }
 
-  const modifyCountry = country.toUpperCase();
+  // const get = await getCountryStatesFromRedis(country);
 
-  const get = await getCountryStatesFromRedis(modifyCountry);
+  // if (get) {
+  //   return res.json(get);
+  // }
 
-  if (get) {
-    return res.json(get);
-  }
-
-  const addCountryToUrl = URL + modifyCountry;
-  const key = await getLocationKey();
-
-  const response = await axios.get(addCountryToUrl, {
-    headers: {
-      Authorization: `Bearer ${key}`,
+  const options = {
+    method: "GET",
+    url: "https://country-state-city-search-rest-api.p.rapidapi.com/states-by-countrycode",
+    params: {
+      countrycode: code.toLowerCase(),
     },
-  });
+    headers: {
+      "x-rapidapi-key": "b29e914ddemsh25268baed446881p1e513djsnb6dec9ccf4fe",
+      "x-rapidapi-host": "country-state-city-search-rest-api.p.rapidapi.com",
+    },
+  };
 
-  const states = response?.data;
+  const response = await axios.request(options);
+  const states = response.data;
 
-  if (!states?.length) {
-    return next(new HandleGlobalError("Issue in getting states"));
-  }
+  // const addCountryToUrl = URL + modifyCountry;
+  // const key = await getLocationKey();
 
-  const modifyStates = states.map((state) => state.state_name);
+  // const response = await axios.get(addCountryToUrl, {
+  //   headers: {
+  //     Authorization: `Bearer ${key}`,
+  //   },
+  // });
 
-  await setCountryStatesIntoRedis(modifyCountry, modifyStates);
+  // const states = response?.data;
 
-  return res.json(modifyStates);
+  // if (!states?.length) {
+  //   return next(new HandleGlobalError("Issue in getting states"));
+  // }
+
+  // const modifyStates = states.map((state) => state.state_name);
+
+  // await setCountryStatesIntoRedis(country, states);
+
+  return res.json(states);
 });
 
 export default getCountryStates;

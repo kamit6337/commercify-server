@@ -32,7 +32,7 @@ const webhookCheckout = catchAsyncError(async (request, response) => {
   const {
     products,
     address: addressId,
-    cartSessionId,
+    orderId,
   } = JSON.parse(metadata.willBuyProducts);
 
   await connectToDB();
@@ -56,7 +56,7 @@ const webhookCheckout = catchAsyncError(async (request, response) => {
     products.map(async (product) => {
       const obj = {
         ...product,
-        cartSessionId,
+        orderId,
         stripeId,
         user: client_reference_id,
         address: addNewAddress._id,

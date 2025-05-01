@@ -13,7 +13,7 @@ const buySchema = new mongoose.Schema(
       required: true,
       select: false,
     },
-    cartSessionId: {
+    orderId: {
       type: String,
       required: true,
       select: false,

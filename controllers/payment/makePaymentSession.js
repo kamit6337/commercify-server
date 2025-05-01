@@ -13,7 +13,7 @@ const Stripe = stripe(environment.STRIPE_SECRET_KEY);
 const makePaymentSession = catchAsyncError(async (req, res, next) => {
   const user = req.user;
   const userId = req.userId;
-  const CHECKOUT_SESSION_ID = generateSecureString();
+  const CHECKOUT_ORDER_ID = generateSecureString();
 
   const { products, address: addressId, code, exchangeRate, symbol } = req.body;
 
@@ -30,7 +30,7 @@ const makePaymentSession = catchAsyncError(async (req, res, next) => {
   const willBuyProducts = {
     products: [],
     address: addressId,
-    cartSessionId: CHECKOUT_SESSION_ID,
+    orderId: CHECKOUT_ORDER_ID,
   };
 
   let lineItems = findProducts.map((product) => {
@@ -111,7 +111,7 @@ const makePaymentSession = catchAsyncError(async (req, res, next) => {
   // Create a PaymentIntent with the order amount and currency
   const session = await Stripe.checkout.sessions.create({
     payment_method_types: ["card"],
-    success_url: `${environment.CLIENT_URL}/payment/success?cartSessionId=${CHECKOUT_SESSION_ID}`,
+    success_url: `${environment.CLIENT_URL}/payment/success?orderId=${CHECKOUT_ORDER_ID}`,
     cancel_url: environment.CLIENT_URL + "/payment/cancel",
     customer: customer.id,
     client_reference_id: userId,

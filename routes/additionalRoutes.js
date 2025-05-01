@@ -8,7 +8,8 @@ const router = express.Router();
 
 router.get("/countries", getCountryFromLanLon);
 
-router.get("/states", getCountryStates).get("/cities", getStateCities);
+router.get("/states", getCountryStates);
+router.get("/cities", getStateCities);
 
 router.get("/currency", getCurrencyExchange);
 

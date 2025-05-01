@@ -4,24 +4,24 @@ import {
   setUserBuysBySessionID,
 } from "../../redis/Buy/userBuysSessionID.js";
 
-const buysFromSessionID = async (cartSessionId) => {
-  const get = await getUserBuysBySessionID(cartSessionId);
+const buysFromOrderId = async (orderId) => {
+  const get = await getUserBuysBySessionID(orderId);
 
   if (get) {
     return get;
   }
 
   const buys = await Buy.find({
-    cartSessionId,
+    orderId,
   })
     .sort("-createdAt")
     .populate("product")
     .populate("address")
     .lean();
 
-  await setUserBuysBySessionID(cartSessionId, buys);
+  await setUserBuysBySessionID(orderId, buys);
 
   return buys;
 };
 
-export default buysFromSessionID;
+export default buysFromOrderId;

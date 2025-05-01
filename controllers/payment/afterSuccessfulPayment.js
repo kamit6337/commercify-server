@@ -1,15 +1,15 @@
 import catchAsyncError from "../../lib/catchAsyncError.js";
 import HandleGlobalError from "../../lib/HandleGlobalError.js";
-import buysFromSessionID from "../../database/Buy/buysFromSessionID.js";
+import buysFromOrderId from "../../database/Buy/buysFromOrderId.js";
 
 const afterSuccessfulPayment = catchAsyncError(async (req, res, next) => {
-  const { cartSessionId } = req.query;
+  const { orderId } = req.query;
 
-  if (!cartSessionId) {
+  if (!orderId) {
     return next(new HandleGlobalError("Please provide ID", 404));
   }
 
-  const products = await buysFromSessionID(cartSessionId);
+  const products = await buysFromOrderId(orderId);
 
   res.json(products);
 });
