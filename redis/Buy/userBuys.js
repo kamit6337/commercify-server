@@ -9,9 +9,7 @@ export const getSingleBuyFromRedis = async (buyId) => {
 };
 
 export const getUserBuysRedis = async (userId, page, limit) => {
-  if (!userId || !page || !limit) {
-    throw new Error("UserId or Page or Limit are not provided");
-  }
+  if (!userId || !page || !limit) return null
 
   const skip = (page - 1) * limit;
 
@@ -33,9 +31,7 @@ export const getUserBuysRedis = async (userId, page, limit) => {
 };
 
 export const setUserBuysRedis = async (userId, buys) => {
-  if (!userId || !buys.length) {
-    throw new Error("UserId or Buys is not provided");
-  }
+  if (!userId || !buys || buys.length === 0) return;
 
   const multi = redisClient.multi();
 

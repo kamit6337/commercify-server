@@ -1,9 +1,7 @@
 import redisClient from "../redisClient.js";
 
 export const getUserIdFromRedis = async (secretToken) => {
-  if (!secretToken) {
-    throw new Error("Secret Token is not provided");
-  }
+  if (!secretToken) return null;
 
   const get = await redisClient.get(secretToken);
 
@@ -21,9 +19,7 @@ export const setUserIdIntoRedis = async (
 };
 
 export const deleteKeyFromRedis = async (secretToken) => {
-  if (!secretToken) {
-    throw new Error("Secret Token is not provided");
-  }
+  if (!secretToken) return;
 
   const deleted = await redisClient.del(secretToken);
 

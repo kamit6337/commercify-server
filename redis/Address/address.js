@@ -63,9 +63,7 @@ export const setUserAddressRedis = async (userId, addresses) => {
 };
 
 export const setSingleUserAddressRedis = async (userId, address) => {
-  if (!userId || !address) {
-    throw new Error("UserId or Address is not provided");
-  }
+  if (!userId || !address) return;
 
   const newDate = new Date(address.updatedAt);
   const score = newDate.getTime();
@@ -81,9 +79,7 @@ export const setSingleUserAddressRedis = async (userId, address) => {
 };
 
 export const deleteSingleUserAddressRedis = async (userId, addressId) => {
-  if (!userId || !addressId) {
-    throw new Error("UserId or AddressId is not provided");
-  }
+  if (!userId || !addressId) return;
 
   await redisClient.zrem(`User-Adresses:${userId}`, addressId);
 

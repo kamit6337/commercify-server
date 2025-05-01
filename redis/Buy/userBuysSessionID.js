@@ -17,9 +17,7 @@ export const getUserBuysBySessionID = async (orderId) => {
 };
 
 export const setUserBuysBySessionID = async (orderId, buys) => {
-  if (!orderId || !buys.length) {
-    throw new Error("orderId or Buys is not provided");
-  }
+  if (!orderId || !buys || buys.length === 0) return;
 
   const multi = redisClient.multi();
 
@@ -37,9 +35,7 @@ export const setUserBuysBySessionID = async (orderId, buys) => {
 };
 
 export const setUserSingleBuyByOrderId = async (orderId, buy) => {
-  if (!orderId || !buy) {
-    throw new Error("orderId or Buy is not provided");
-  }
+  if (!orderId || !buy) return;
 
   const newDate = new Date(buy.createdAt);
   const score = newDate.getTime();
