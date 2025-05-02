@@ -23,7 +23,7 @@ const makePaymentSession = catchAsyncError(async (req, res, next) => {
   }
 
   const allExchange = await getExchange();
-  const exchangeRate = allExchange[code];
+  const exchangeRate = Math.trunc(allExchange[code]);
 
   const findAddress = await getAddressByID(addressId);
 
@@ -64,7 +64,7 @@ const makePaymentSession = catchAsyncError(async (req, res, next) => {
       product: _id,
       price: Number(discountedPriceWithoutExchangeRate),
       quantity: Number(findQuantity.quantity),
-      exchangeRate: Number(exchangeRate),
+      exchangeRate: exchangeRate,
       deliveredDate: dateInMilli(Number(deliveredBy)),
     };
 

@@ -7,6 +7,10 @@ import {
 const getSingleBuyDB = async (userId, buyId) => {
   const get = await getSingleBuyFromRedis(buyId);
 
+  if (get) {
+    return get;
+  }
+
   const buy = await Buy.findOne({
     _id: buyId,
   })
