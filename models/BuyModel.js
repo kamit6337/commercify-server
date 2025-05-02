@@ -52,9 +52,19 @@ const buySchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    reasonForCancelled: {
+      type: String,
+      default: "",
+      trim: true,
+    },
     isReturned: {
       type: Boolean,
       default: false,
+    },
+    reasonForReturned: {
+      type: String,
+      default: "",
+      trim: true,
     },
   },
   {

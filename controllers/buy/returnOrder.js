@@ -5,14 +5,15 @@ import HandleGlobalError from "../../lib/HandleGlobalError.js";
 const returnOrder = catchAsyncError(async (req, res, next) => {
   const userId = req.userId;
 
-  const { id: buyId } = req.body;
+  const { id: buyId, reason } = req.body;
 
-  if (!buyId) {
-    return next(new HandleGlobalError("Id id not provided", 404));
+  if (!buyId || !reason) {
+    return next(new HandleGlobalError("Id or reason is not provided", 404));
   }
 
   const obj = {
     isReturned: true,
+    reasonForReturned: reason,
   };
 
   await userBuyUpdateDB(userId, buyId, obj);
