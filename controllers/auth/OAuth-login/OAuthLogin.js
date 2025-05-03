@@ -6,6 +6,7 @@ import getUserByEmail from "../../../database/User/getUserByEmail.js";
 import postCreateUser from "../../../database/User/postCreateUser.js";
 import checkS3Credentials from "../../../lib/aws/checkS3Credentials.js";
 import uploadProfileImageToS3 from "../../../lib/aws/uploadProfileImageToS3.js";
+import adminEmailList from "../../../data/adminEmailList.js";
 
 // NOTE: LOGIN SUCCESS
 const OAuthLogin = catchAsyncError(async (req, res, next) => {
@@ -39,6 +40,7 @@ const OAuthLogin = catchAsyncError(async (req, res, next) => {
       photo: uploadedPicture,
       OAuthId: id,
       OAuthProvider: provider,
+      role: adminEmailList.includes(email) ? "admin" : "user",
     };
 
     const createUser = await postCreateUser(obj);

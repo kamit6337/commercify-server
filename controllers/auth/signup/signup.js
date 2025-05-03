@@ -8,6 +8,7 @@ import {
   setUserOTPIntoRedis,
   setUserSignupDataIntoRedis,
 } from "../../../redis/Auth/signUp.js";
+import adminEmailList from "../../../data/adminEmailList.js";
 
 const signup = catchAsyncError(async (req, res, next) => {
   const { name, email, password, dial_code, mobile } = req.body;
@@ -39,7 +40,9 @@ const signup = catchAsyncError(async (req, res, next) => {
     password,
     dial_code,
     mobile,
+    role: adminEmailList.includes(email) ? "admin" : "user",
   };
+
   await setUserSignupDataIntoRedis(email, obj);
 
   res.json({
