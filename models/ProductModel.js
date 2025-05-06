@@ -31,6 +31,14 @@ const productSchema = new Schema(
       type: String,
       required: [true, "You must provide thumbnail for your product"],
     },
+    rate: {
+      type: Number,
+      default: 0,
+    },
+    rateCount: {
+      type: Number,
+      default: 0,
+    },
     images: [
       {
         type: String,

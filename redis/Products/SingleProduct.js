@@ -15,3 +15,9 @@ export const setSingleProductRedis = async (product) => {
     3600
   );
 };
+
+export const deleteSingleProductRedis = async (productId) => {
+  if (!productId) return;
+
+  await redisClient.del(`Product:${productId.toString()}`);
+};

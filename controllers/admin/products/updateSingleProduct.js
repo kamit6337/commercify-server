@@ -1,6 +1,6 @@
-import updateProductDB from "../../database/Products/updateProductDB.js";
-import catchAsyncError from "../../lib/catchAsyncError.js";
-import HandleGlobalError from "../../lib/HandleGlobalError.js";
+import updateProductDB from "../../../database/Products/updateProductDB.js";
+import catchAsyncError from "../../../lib/catchAsyncError.js";
+import HandleGlobalError from "../../../lib/HandleGlobalError.js";
 
 const updateSingleProduct = catchAsyncError(async (req, res, next) => {
   const {

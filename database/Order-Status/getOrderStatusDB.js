@@ -1,6 +1,6 @@
 import Buy from "../../models/BuyModel.js";
 
-const getOrderStatusDB = async (time = "day") => {
+const getOrderStatusDB = async (time = "month") => {
   //   const allOrdered = await Buy.countDocuments({
   //     isDelivered: false,
   //     isCancelled: false,
@@ -20,9 +20,13 @@ const getOrderStatusDB = async (time = "day") => {
   //   });
 
   const now = new Date();
-
   const startDate = new Date(now);
-  startDate.setDate(startDate.getDate() - 1);
+
+  if (time === "day") {
+    startDate.setDate(startDate.getDate() - 1);
+  } else if (time === "month") {
+    startDate.setMonth(startDate.getMonth() - 1);
+  }
 
   const result = await Buy.aggregate([
     {

@@ -47,3 +47,21 @@ export const setLatestProductsRedis = async (products) => {
 
   await multi.exec();
 };
+
+export const setNewProductIntoRedis = async (product) => {
+  if (!product) return;
+
+  const newDate = new Date(product.createdAt);
+  const score = newDate.getTime();
+
+  await redisClient.zadd(`Latest-Products`, score, product._id.toString());
+
+  await redisClient.set(
+    `Product:${product._id.toString()}`,
+    JSON.stringify(product),
+    "EX",
+    3600
+  );
+
+  await redisClient.expire(`Latest-Products`, 3600);
+};

@@ -12,6 +12,7 @@ import stripeRouter from "./routes/stripeRoutes.js";
 import searchRouter from "./routes/searchRoutes.js";
 import additionalRouter from "./routes/additionalRoutes.js";
 import adminRouter from "./routes/adminRoutes.js";
+import fileRouter from "./routes/fileRoutes.js";
 import globalErrorHandler from "./middlewares/globalErrorHandler.js";
 import globalMiddlewares from "./middlewares/globalMiddlewares.js";
 import protectRoute from "./middlewares/protectRoute.js";
@@ -52,6 +53,7 @@ app.use("/stripe", stripeRouter);
 app.use("/search", searchRouter);
 app.use("/additional", additionalRouter);
 app.use("/admin", adminRouter);
+app.use("/file", protectRoute, fileRouter);
 
 // NOTE: UNIDENTIFIED ROUTES
 app.all("*", unidentifiedError);
