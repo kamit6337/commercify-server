@@ -31,7 +31,7 @@ const createNewBuyDB = async (obj) => {
     updatedAt: newBuy.updatedAt,
   };
 
-  await setUserSingleBuyByOrderId(buyObj);
+  await setUserSingleBuyByOrderId(newBuy.orderId, buyObj);
 
   return newBuy;
 };

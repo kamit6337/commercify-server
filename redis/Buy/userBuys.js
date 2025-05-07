@@ -9,7 +9,7 @@ export const getSingleBuyFromRedis = async (buyId) => {
 };
 
 export const getUserBuysRedis = async (userId, page, limit) => {
-  if (!userId || !page || !limit) return null
+  if (!userId || !page || !limit) return null;
 
   const skip = (page - 1) * limit;
 
@@ -64,14 +64,10 @@ export const setSingleUserBuyRedis = async (userId, buy) => {
 export const updateUserBuysRedis = async (buy) => {
   if (!buy) return;
 
-  const get = await redisClient.get(`Buy:${buy._id.toString()}`);
-
-  if (!get) return null;
-
-  const updated = {
-    ...JSON.parse(get),
-    ...buy,
-  };
-
-  await redisClient.set(`Buy:${buy._id.toString()}`, JSON.stringify(updated));
+  await redisClient.set(
+    `Buy:${buy._id.toString()}`,
+    JSON.stringify(buy),
+    "EX",
+    3600
+  );
 };
