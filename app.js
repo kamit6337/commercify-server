@@ -19,8 +19,13 @@ import protectRoute from "./middlewares/protectRoute.js";
 import unidentifiedError from "./middlewares/unidentifiedError.js";
 import webhookCheckout from "./controllers/payment/webhookCheckout.js";
 import protectAdminRoutes from "./middlewares/protectAdminRoutes.js";
+import socketConnect from "./lib/socketConnect.js";
+import newConnection from "./socket/newConnection.js";
+import joinRooms from "./socket/joinRooms.js";
+import onDisconnect from "./socket/onDisconnect.js";
+import socketAuthMiddleware from "./middlewares/socketAuthMiddleware.js";
 
-const app = express();
+const { app, httpServer, io } = socketConnect();
 
 // MARK: WEBHOOK-CHECKOUT
 app.post(
@@ -35,6 +40,20 @@ app.get("/", (req, res) => {
 
 app.get("/health", (req, res) => {
   res.json({ message: "Server Health is fine and good" });
+});
+
+// NOTE: SOCKET CONNECTION
+io.use(socketAuthMiddleware);
+
+io.on("connection", (socket) => {
+  console.log(`User connected: ${socket.id}`);
+
+  const userId = socket.userId;
+  socket.join(userId);
+
+  newConnection(socket);
+  joinRooms(socket);
+  onDisconnect(socket);
 });
 
 // NOTE: GLOBAL MIDDLEWARES
@@ -52,7 +71,7 @@ app.use("/payment", protectRoute, paymentRouter);
 app.use("/stripe", stripeRouter);
 app.use("/search", searchRouter);
 app.use("/additional", additionalRouter);
-app.use("/admin", adminRouter);
+app.use("/admin", protectAdminRoutes, adminRouter);
 app.use("/file", protectRoute, fileRouter);
 
 // NOTE: UNIDENTIFIED ROUTES
@@ -61,4 +80,6 @@ app.all("*", unidentifiedError);
 //  NOTE: GLOBAL ERROR HANDLER
 app.use(globalErrorHandler);
 
-export default app;
+export { app };
+
+export default httpServer;

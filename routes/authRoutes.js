@@ -11,6 +11,7 @@ import verifySignup from "../controllers/auth/signup/verifySignup.js";
 import resendOtp from "../controllers/auth/signup/resendOtp.js";
 import rateLimit from "express-rate-limit";
 import slowDown from "express-slow-down";
+import protectAdminRoutes from "../middlewares/protectAdminRoutes.js";
 
 const router = express.Router();
 
@@ -32,6 +33,9 @@ const speedLimiter = slowDown({
 
 // NOTE: CONTINUOUS CHECK LOGIN
 router.get("/login/check", loginCheck);
+
+// NOTE: CONTINUOUS CHECK ADMIN LOGIN
+router.get("/login/admin/check", protectAdminRoutes, loginCheck);
 
 // NOTE: FORGOT PASSWORD
 router.post(

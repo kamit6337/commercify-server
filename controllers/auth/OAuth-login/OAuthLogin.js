@@ -9,62 +9,69 @@ import uploadProfileImageToS3 from "../../../lib/aws/uploadProfileImageToS3.js";
 import adminEmailList from "../../../data/adminEmailList.js";
 
 // NOTE: LOGIN SUCCESS
-const OAuthLogin = catchAsyncError(async (req, res, next) => {
-  if (!req.user)
-    return next(
-      new HandleGlobalError("Error in login. Please try again!", 403)
-    );
-
-  let {
-    id,
-    provider,
-    _json: { name, email, picture },
-  } = req.user;
-
-  let findUser = await getUserByEmail(email);
-
-  if (!findUser) {
-    // MARK: IF NOT FIND USER
-
-    let uploadedPicture = picture; // Default to the original picture URL
-
-    // Dynamically check S3 credentials and upload if valid
-    const isS3Available = await checkS3Credentials();
-    if (isS3Available) {
-      uploadedPicture = await uploadProfileImageToS3(picture);
+const OAuthLogin = async (req, res, next) => {
+  try {
+    if (!req.user) {
+      res.redirect(`${environment.CLIENT_URL}/oauth`);
+      return;
     }
 
-    const obj = {
-      name,
-      email,
-      photo: uploadedPicture,
-      OAuthId: id,
-      OAuthProvider: provider,
-      role: adminEmailList.includes(email) ? "admin" : "user",
-    };
+    let {
+      id,
+      provider,
+      _json: { name, email, picture },
+    } = req.user;
 
-    const createUser = await postCreateUser(obj);
+    let findUser = await getUserByEmail(email);
 
-    if (!createUser) {
-      return next(new HandleGlobalError("Issue in Signup", 404));
+    if (!findUser) {
+      // MARK: IF NOT FIND USER
+
+      let uploadedPicture = picture; // Default to the original picture URL
+
+      // Dynamically check S3 credentials and upload if valid
+      const isS3Available = await checkS3Credentials();
+      if (isS3Available) {
+        uploadedPicture = await uploadProfileImageToS3(picture);
+      }
+
+      const obj = {
+        name,
+        email,
+        photo: uploadedPicture,
+        OAuthId: id,
+        OAuthProvider: provider,
+        role: adminEmailList.includes(email) ? "admin" : "user",
+      };
+
+      const createUser = await postCreateUser(obj);
+
+      if (!createUser) {
+        res.redirect(`${environment.CLIENT_URL}/oauth`);
+        return;
+      }
+
+      const token = encrypt({
+        id: createUser._id.toString(),
+        role: createUser.role,
+      });
+
+      res.redirect(`${environment.CLIENT_URL}/oauth?token=${token}`);
+      return;
     }
 
+    // MARK: IF FIND USER IS PRESENT
     const token = encrypt({
-      id: createUser._id.toString(),
-      role: createUser.role,
+      id: findUser._id,
+      role: findUser.role,
     });
 
     res.redirect(`${environment.CLIENT_URL}/oauth?token=${token}`);
-    return;
+  } catch (error) {
+    console.log("Error in OAuth Login", error);
+
+    res.redirect(`${environment.CLIENT_URL}/oauth`);
   }
-
-  // MARK: IF FIND USER IS PRESENT
-  const token = encrypt({
-    id: findUser._id,
-    role: findUser.role,
-  });
-
-  res.redirect(`${environment.CLIENT_URL}/oauth?token=${token}`);
-});
+};
 
 export default OAuthLogin;

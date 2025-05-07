@@ -3,6 +3,8 @@ import catchAsyncError from "../lib/catchAsyncError.js";
 import { decrypt } from "../lib/encryptAndDecrypt.js";
 import getUserById from "../database/User/getUserById.js";
 
+const BEARER = "Bearer";
+
 const protectAdminRoutes = catchAsyncError(async (req, res, next) => {
   if (!req || !req.headers) {
     throw new Error("Something went wrong. Please try later");
