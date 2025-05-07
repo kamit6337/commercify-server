@@ -1,11 +1,10 @@
 import stripe from "stripe";
 import { environment } from "../../utils/environment.js";
 import catchAsyncError from "../../lib/catchAsyncError.js";
-import Address from "../../models/AddressModel.js";
-import connectToDB from "../../lib/connectToDB.js";
 import getAddressByID from "../../database/Address/getAddressByID.js";
 import createNewBuyDB from "../../database/Buy/createNewBuyDB.js";
 import createBuyAddressDB from "../../database/Address/createBuyAddressDB.js";
+import { getUserOrderCheckoutFromRedis } from "../../redis/order/userCheckout.js";
 
 const Stripe = stripe(environment.STRIPE_SECRET_KEY);
 const webhookSecretKey = environment.STRIPE_WEBHOOK_SECRET_KEY;
@@ -30,15 +29,23 @@ const webhookCheckout = catchAsyncError(async (request, response) => {
   const session = event.data.object;
   const { client_reference_id, metadata, id: stripeId } = session;
 
-  const {
-    products,
-    address: addressId,
-    orderId,
-  } = JSON.parse(metadata.willBuyProducts);
+  const CHECKOUT_ORDER_ID = metadata.willBuyProducts;
 
-  await connectToDB();
+  console.log("CHECKOUT_ORDER_ID", CHECKOUT_ORDER_ID);
+
+  const data = await getUserOrderCheckoutFromRedis(CHECKOUT_ORDER_ID);
+
+  console.log("data", data);
+
+  if (!data) {
+    response.status(403).json("Error occur in storing data");
+  }
+
+  const { products, address: addressId, orderId } = data;
 
   const findAddress = await getAddressByID(addressId);
+
+  console.log("findAddress", findAddress);
 
   const { name, mobile, address, district, state, country, dial_code } =
     findAddress;

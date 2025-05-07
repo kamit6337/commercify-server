@@ -41,7 +41,8 @@ const getOrderStatusDB = async (time = "month") => {
     {
       $group: {
         _id: null,
-        ordered: {
+        ordered: { $sum: 1 },
+        undelivered: {
           $sum: {
             $cond: [
               {
@@ -66,6 +67,7 @@ const getOrderStatusDB = async (time = "month") => {
   return (
     result[0] || {
       ordered: 0,
+      undelivered: 0,
       delivered: 0,
       cancelled: 0,
       returned: 0,

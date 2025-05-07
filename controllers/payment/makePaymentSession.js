@@ -8,6 +8,7 @@ import generateSecureString from "../../utils/javaScript/generateSecureString.js
 import getAddressByID from "../../database/Address/getAddressByID.js";
 import getProductsFromIdsDB from "../../database/Products/getProductsFromIdsDB.js";
 import getExchange from "../additional/getExchange.js";
+import { setUserOrderCheckoutIntoRedis } from "../../redis/order/userCheckout.js";
 
 const Stripe = stripe(environment.STRIPE_SECRET_KEY);
 
@@ -113,6 +114,8 @@ const makePaymentSession = catchAsyncError(async (req, res, next) => {
     },
   });
 
+  await setUserOrderCheckoutIntoRedis(CHECKOUT_ORDER_ID, willBuyProducts);
+
   // Create a PaymentIntent with the order amount and currency
   const session = await Stripe.checkout.sessions.create({
     payment_method_types: ["card"],
@@ -126,7 +129,7 @@ const makePaymentSession = catchAsyncError(async (req, res, next) => {
     },
     line_items: lineItems,
     metadata: {
-      willBuyProducts: JSON.stringify(willBuyProducts),
+      willBuyProducts: CHECKOUT_ORDER_ID,
     },
   });
 
