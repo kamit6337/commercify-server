@@ -5,12 +5,16 @@ import getAddressByID from "../../database/Address/getAddressByID.js";
 import createNewBuyDB from "../../database/Buy/createNewBuyDB.js";
 import { getUserOrderCheckoutFromRedis } from "../../redis/order/userCheckout.js";
 import createNewAddressDB from "../../database/Address/createNewAddressDB.js";
+import { getAdminUsersFromRedis } from "../../redis/User/adminUser.js";
+import socketConnect from "../../lib/socketConnect.js";
 
 const Stripe = stripe(environment.STRIPE_SECRET_KEY);
 const webhookSecretKey = environment.STRIPE_WEBHOOK_SECRET_KEY;
 
 const webhookCheckout = catchAsyncError(async (request, response) => {
   const sig = request.headers["stripe-signature"];
+
+  const { io } = socketConnect();
 
   let event;
   try {
@@ -69,6 +73,15 @@ const webhookCheckout = catchAsyncError(async (request, response) => {
   const result = await createNewBuyDB(buyObjs);
 
   console.log("result", result);
+
+  const adminUsers = await getAdminUsersFromRedis();
+
+  console.log("adminUsers", adminUsers);
+
+  adminUsers.forEach((admin) => {
+    if (!admin) return;
+    io.to(admin).emit("new-orders", result);
+  });
 
   // Return a 200 response to acknowledge receipt of the event
   response.send();

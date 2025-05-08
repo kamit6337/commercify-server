@@ -14,14 +14,12 @@ const afterSuccessfulPayment = catchAsyncError(async (req, res, next) => {
 
   const buys = await buysFromOrderId(orderId);
 
-  const adminUsers = await getAdminUsersFromRedis();
+  // const adminUsers = await getAdminUsersFromRedis();
 
-  console.log("adminUsers", adminUsers);
-
-  adminUsers.forEach((admin) => {
-    if (!admin) return;
-    io.to(admin).emit("new-orders", buys);
-  });
+  // adminUsers.forEach((admin) => {
+  //   if (!admin) return;
+  //   io.to(admin).emit("new-orders", buys);
+  // });
 
   res.json(buys);
 });
