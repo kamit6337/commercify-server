@@ -47,22 +47,32 @@ const webhookCheckout = catchAsyncError(async (request, response) => {
 
   console.log("findAddress", findAddress);
 
-  const { name, mobile, address, district, state, country, dial_code } =
-    findAddress;
+  // const { name, mobile, address, district, state, country, dial_code } =
+  //   findAddress;
 
-  const addressObj = {
-    name,
-    mobile: Number(mobile),
-    address,
-    district,
-    country,
-    dial_code,
-    state,
+  const newAddressObj = {
+    ...findAddress,
   };
 
-  const addNewAddress = await createBuyAddressDB(addressObj);
+  delete newAddressObj._id;
+  delete newAddressObj.user;
+  delete newAddressObj.createdAt;
+  delete newAddressObj.updatedAt;
+  // const newAddressObj = {
+  //   name,
+  //   mobile: Number(mobile),
+  //   address,
+  //   district,
+  //   country,
+  //   dial_code,
+  //   state,
+  // };
 
-  await Promise.all(
+  const addNewAddress = await createBuyAddressDB(newAddressObj);
+
+  console.log("addNewAddress", addNewAddress);
+
+  const allBuys = await Promise.all(
     products.map(async (product) => {
       const obj = {
         ...product,
@@ -75,6 +85,8 @@ const webhookCheckout = catchAsyncError(async (request, response) => {
       return createNewBuyDB(obj);
     })
   );
+
+  console.log("allBuys", allBuys);
 
   // Return a 200 response to acknowledge receipt of the event
   response.send();
