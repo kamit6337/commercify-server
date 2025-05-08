@@ -1,14 +1,8 @@
 import Buy from "../../models/BuyModel.js";
-import {
-  getSingleBuyFromRedis,
-  setSingleUserBuyRedis,
-} from "../../redis/Buy/userBuys.js";
 
-const getSingleBuyDB = async (userId, buyId) => {
-  const get = await getSingleBuyFromRedis(buyId);
-
-  if (get) {
-    return get;
+const getSingleBuyDB = async (buyId) => {
+  if (!buyId) {
+    throw new Error("BuyId is not provided");
   }
 
   const buy = await Buy.findOne({
@@ -16,8 +10,6 @@ const getSingleBuyDB = async (userId, buyId) => {
   })
     .populate("product")
     .populate("address");
-
-  await setSingleUserBuyRedis(userId, buy);
 
   return buy;
 };

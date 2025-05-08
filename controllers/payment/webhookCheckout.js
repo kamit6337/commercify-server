@@ -3,8 +3,8 @@ import { environment } from "../../utils/environment.js";
 import catchAsyncError from "../../lib/catchAsyncError.js";
 import getAddressByID from "../../database/Address/getAddressByID.js";
 import createNewBuyDB from "../../database/Buy/createNewBuyDB.js";
-import createBuyAddressDB from "../../database/Address/createBuyAddressDB.js";
 import { getUserOrderCheckoutFromRedis } from "../../redis/order/userCheckout.js";
+import createNewAddressDB from "../../database/Address/createNewAddressDB.js";
 
 const Stripe = stripe(environment.STRIPE_SECRET_KEY);
 const webhookSecretKey = environment.STRIPE_WEBHOOK_SECRET_KEY;
@@ -31,11 +31,7 @@ const webhookCheckout = catchAsyncError(async (request, response) => {
 
   const CHECKOUT_ORDER_ID = metadata.willBuyProducts;
 
-  console.log("CHECKOUT_ORDER_ID", CHECKOUT_ORDER_ID);
-
   const data = await getUserOrderCheckoutFromRedis(CHECKOUT_ORDER_ID);
-
-  console.log("data", data);
 
   if (!data) {
     response.status(403).json("Error occur in storing data");
@@ -45,11 +41,6 @@ const webhookCheckout = catchAsyncError(async (request, response) => {
 
   const findAddress = await getAddressByID(addressId);
 
-  console.log("findAddress", findAddress);
-
-  // const { name, mobile, address, district, state, country, dial_code } =
-  //   findAddress;
-
   const newAddressObj = {
     ...findAddress,
   };
@@ -58,19 +49,8 @@ const webhookCheckout = catchAsyncError(async (request, response) => {
   delete newAddressObj.user;
   delete newAddressObj.createdAt;
   delete newAddressObj.updatedAt;
-  // const newAddressObj = {
-  //   name,
-  //   mobile: Number(mobile),
-  //   address,
-  //   district,
-  //   country,
-  //   dial_code,
-  //   state,
-  // };
 
-  const addNewAddress = await createBuyAddressDB(newAddressObj);
-
-  console.log("addNewAddress", addNewAddress);
+  const addNewAddress = await createNewAddressDB(newAddressObj);
 
   const buyObjs = products.map((product) => {
     return {
@@ -82,23 +62,7 @@ const webhookCheckout = catchAsyncError(async (request, response) => {
     };
   });
 
-  const allBuys = await createNewBuyDB(buyObjs);
-
-  // const allBuys = await Promise.all(
-  //   products.map(async (product) => {
-  //     const obj = {
-  //       ...product,
-  //       orderId,
-  //       stripeId,
-  //       user: client_reference_id,
-  //       address: addNewAddress._id,
-  //     };
-
-  //     return createNewBuyDB(obj);
-  //   })
-  // );
-
-  console.log("allBuys", allBuys);
+  await createNewBuyDB(buyObjs);
 
   // Return a 200 response to acknowledge receipt of the event
   response.send();

@@ -1,7 +1,10 @@
 import Address from "../../models/AddressModel.js";
-import { setSingleUserAddressRedis } from "../../redis/Address/address.js";
 
-const updateAddressDB = async (userId, obj) => {
+const updateAddressDB = async (obj) => {
+  if (!obj) {
+    throw new Error("Obj is not provided");
+  }
+
   const updateAdd = await Address.findOneAndUpdate(
     {
       _id: obj._id,
@@ -14,8 +17,6 @@ const updateAddressDB = async (userId, obj) => {
       new: true,
     }
   );
-
-  await setSingleUserAddressRedis(userId, updateAdd);
 
   return updateAdd;
 };

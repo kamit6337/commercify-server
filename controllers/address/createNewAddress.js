@@ -21,16 +21,17 @@ const createNewAddress = catchAsyncError(async (req, res, next) => {
   }
 
   const obj = {
+    user: userId,
     name,
     dial_code,
-    mobile,
+    mobile: parseInt(mobile),
     address,
     country,
     state,
     district,
   };
 
-  const addNewAddress = await createNewAddressDB(userId, obj);
+  const addNewAddress = await createNewAddressDB(obj);
 
   res.json(addNewAddress);
 });

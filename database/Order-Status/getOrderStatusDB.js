@@ -1,24 +1,6 @@
 import Buy from "../../models/BuyModel.js";
 
 const getOrderStatusDB = async (time = "month") => {
-  //   const allOrdered = await Buy.countDocuments({
-  //     isDelivered: false,
-  //     isCancelled: false,
-  //     isReturned: false,
-  //   });
-
-  //   const allDelivered = await Buy.countDocuments({
-  //     isDelivered: true,
-  //   });
-
-  //   const allCancelled = await Buy.countDocuments({
-  //     isCancelled: true,
-  //   });
-
-  //   const allReturned = await Buy.countDocuments({
-  //     isReturned: true,
-  //   });
-
   const now = new Date();
   const startDate = new Date(now);
 

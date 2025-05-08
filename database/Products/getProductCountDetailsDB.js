@@ -35,14 +35,6 @@ const getProductCountDetailsDB = async () => {
     categoryProducts,
   };
 
-  // const categoryProducts = [
-  //     {
-  //         _id : "dfvsjdklvs",
-  //         title : "Men's cloth",
-  //         categoryProductsCount : 10
-  //     }
-  // ]
-
   return result;
 };
 

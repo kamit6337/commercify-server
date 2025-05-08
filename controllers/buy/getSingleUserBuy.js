@@ -10,7 +10,7 @@ const getSingleUserBuy = catchAsyncError(async (req, res, next) => {
     return next(new HandleGlobalError("Id is not provided"));
   }
 
-  const buy = await getSingleBuyDB(userId, id);
+  const buy = await getSingleBuyDB(id);
 
   res.json(buy);
 });

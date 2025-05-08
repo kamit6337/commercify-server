@@ -1,14 +1,8 @@
 import Buy from "../../models/BuyModel.js";
-import {
-  getUserBuysBySessionID,
-  setUserBuysBySessionID,
-} from "../../redis/Buy/userBuysSessionID.js";
 
 const buysFromOrderId = async (orderId) => {
-  const get = await getUserBuysBySessionID(orderId);
-
-  if (get) {
-    return get;
+  if (!orderId) {
+    throw new Error("OrderId is not provided");
   }
 
   const buys = await Buy.find({
@@ -18,8 +12,6 @@ const buysFromOrderId = async (orderId) => {
     .populate("product")
     .populate("address")
     .lean();
-
-  await setUserBuysBySessionID(orderId, buys);
 
   return buys;
 };

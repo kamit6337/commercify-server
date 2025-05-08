@@ -1,12 +1,15 @@
 import Address from "../../models/AddressModel.js";
-import { deleteSingleUserAddressRedis } from "../../redis/Address/address.js";
 
-const deleteAddressDB = async (userId, id) => {
-  await Address.deleteOne({
+const deleteAddressDB = async (id) => {
+  if (!id) {
+    throw new Error("Id is not provided");
+  }
+
+  const response = await Address.deleteOne({
     _id: id,
   });
 
-  await deleteSingleUserAddressRedis(userId, id);
+  return response;
 };
 
 export default deleteAddressDB;

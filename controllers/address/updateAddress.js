@@ -25,14 +25,14 @@ const updateAddress = catchAsyncError(async (req, res, next) => {
     _id,
     name,
     dial_code,
-    mobile,
+    mobile: parseInt(mobile),
     address,
     country,
     state,
     district,
   };
 
-  const updateAdd = await updateAddressDB(userId, obj);
+  const updateAdd = await updateAddressDB(obj);
 
   res.json(updateAdd);
 });

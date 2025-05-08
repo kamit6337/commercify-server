@@ -1,5 +1,4 @@
 import Buy from "../../models/BuyModel.js";
-import { updateUserBuysRedis } from "../../redis/Buy/userBuys.js";
 import getAddressByID from "../Address/getAddressByID.js";
 import getSingleProductDB from "../Products/getSingleProductDB.js";
 
@@ -27,8 +26,6 @@ const userBuyUpdateDB = async (buyId, obj) => {
     product,
     address,
   };
-
-  await updateUserBuysRedis(buyObj);
 
   return buyObj;
 };

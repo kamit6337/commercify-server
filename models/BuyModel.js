@@ -11,7 +11,6 @@ const buySchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      select: false,
     },
     orderId: {
       type: String,
