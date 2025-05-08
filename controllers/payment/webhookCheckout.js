@@ -41,6 +41,8 @@ const webhookCheckout = catchAsyncError(async (request, response) => {
 
   const findAddress = await getAddressByID(addressId);
 
+  console.log("findAddress", findAddress);
+
   const newAddressObj = {
     ...findAddress,
   };
@@ -52,6 +54,8 @@ const webhookCheckout = catchAsyncError(async (request, response) => {
 
   const addNewAddress = await createNewAddressDB(newAddressObj);
 
+  console.log("addNewAddress", addNewAddress);
+
   const buyObjs = products.map((product) => {
     return {
       ...product,
@@ -62,7 +66,9 @@ const webhookCheckout = catchAsyncError(async (request, response) => {
     };
   });
 
-  await createNewBuyDB(buyObjs);
+  const result = await createNewBuyDB(buyObjs);
+
+  console.log("result", result);
 
   // Return a 200 response to acknowledge receipt of the event
   response.send();
