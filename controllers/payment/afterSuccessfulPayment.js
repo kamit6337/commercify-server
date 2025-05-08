@@ -16,6 +16,8 @@ const afterSuccessfulPayment = catchAsyncError(async (req, res, next) => {
 
   const adminUsers = await getAdminUsersFromRedis();
 
+  console.log("adminUsers", adminUsers);
+
   adminUsers.forEach((admin) => {
     if (!admin) return;
     io.to(admin).emit("new-orders", buys);

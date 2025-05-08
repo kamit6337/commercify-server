@@ -72,19 +72,31 @@ const webhookCheckout = catchAsyncError(async (request, response) => {
 
   console.log("addNewAddress", addNewAddress);
 
-  const allBuys = await Promise.all(
-    products.map(async (product) => {
-      const obj = {
-        ...product,
-        orderId,
-        stripeId,
-        user: client_reference_id,
-        address: addNewAddress._id,
-      };
+  const buyObjs = products.map((product) => {
+    return {
+      ...product,
+      orderId,
+      stripeId,
+      user: client_reference_id,
+      address: addNewAddress._id,
+    };
+  });
 
-      return createNewBuyDB(obj);
-    })
-  );
+  const allBuys = await createNewBuyDB(buyObjs);
+
+  // const allBuys = await Promise.all(
+  //   products.map(async (product) => {
+  //     const obj = {
+  //       ...product,
+  //       orderId,
+  //       stripeId,
+  //       user: client_reference_id,
+  //       address: addNewAddress._id,
+  //     };
+
+  //     return createNewBuyDB(obj);
+  //   })
+  // );
 
   console.log("allBuys", allBuys);
 
