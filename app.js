@@ -72,7 +72,7 @@ app.use("/stripe", stripeRouter);
 app.use("/search", searchRouter);
 app.use("/additional", additionalRouter);
 app.use("/admin", protectAdminRoutes, adminRouter);
-app.use("/file", protectRoute, fileRouter);
+app.use("/file", protectAdminRoutes, fileRouter);
 
 // NOTE: UNIDENTIFIED ROUTES
 app.all("*", unidentifiedError);
