@@ -29,9 +29,9 @@ const getOrderStatusDB = async (time = "month") => {
             $cond: [
               {
                 $and: [
-                  { $not: ["$isDelivered"] },
-                  { $not: ["$isCancelled"] },
-                  { $not: ["$isReturned"] },
+                  { $eq: ["$isDelivered", false] },
+                  { $eq: ["$isCancelled", false] },
+                  { $eq: ["$isReturned", false] },
                 ],
               },
               1,
@@ -39,7 +39,20 @@ const getOrderStatusDB = async (time = "month") => {
             ],
           },
         },
-        delivered: { $sum: { $cond: ["$isDelivered", 1, 0] } },
+        delivered: {
+          $sum: {
+            $cond: [
+              {
+                $and: [
+                  { $eq: ["$isDelivered", true] },
+                  { $eq: ["$isReturned", false] },
+                ],
+              },
+              1,
+              0,
+            ],
+          },
+        },
         cancelled: { $sum: { $cond: ["$isCancelled", 1, 0] } },
         returned: { $sum: { $cond: ["$isReturned", 1, 0] } },
       },

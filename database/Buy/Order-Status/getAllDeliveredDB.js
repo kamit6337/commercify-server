@@ -9,6 +9,7 @@ const getAllDeliveredDB = async (page, limit) => {
 
   const buys = await Buy.find({
     isDelivered: true,
+    isReturned: false,
   })
     .sort("-createdAt")
     .skip(skip)
