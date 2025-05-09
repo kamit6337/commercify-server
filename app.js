@@ -24,6 +24,7 @@ import newConnection from "./socket/newConnection.js";
 import joinRooms from "./socket/joinRooms.js";
 import onDisconnect from "./socket/onDisconnect.js";
 import socketAuthMiddleware from "./middlewares/socketAuthMiddleware.js";
+import "./redis/Pub-Sub/newOrder.js";
 
 // MARK: WEBHOOK-CHECKOUT
 app.post(
