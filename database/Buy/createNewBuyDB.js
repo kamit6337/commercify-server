@@ -8,8 +8,11 @@ const createNewBuyDB = async (objs, newAddress) => {
 
   const newBuy = await Buy.insertMany(objs);
 
+  // Convert to plain JS objects
+  const newBuyPlain = newBuy.map((doc) => doc.toObject());
+
   const updateNewBuy = await Promise.all(
-    newBuy.map(async (buy) => {
+    newBuyPlain.map(async (buy) => {
       const productId = buy.product;
 
       const product = await getSingleProductDB(productId);

@@ -1,11 +1,10 @@
 import userBuyUpdateDB from "../../../database/Buy/userBuyUpdateDB.js";
 import catchAsyncError from "../../../lib/catchAsyncError.js";
 import HandleGlobalError from "../../../lib/HandleGlobalError.js";
-import socketConnect from "../../../lib/socketConnect.js";
+import { io } from "../../../lib/socketConnect.js";
 
 const updateUserCheckoutOrder = catchAsyncError(async (req, res, next) => {
   const { id } = req.body;
-  const { io } = socketConnect();
 
   if (!id) {
     return next(new HandleGlobalError("Id is not provided", 403));

@@ -1,7 +1,7 @@
 import stripe from "stripe";
 import { environment } from "../../utils/environment.js";
 import catchAsyncError from "../../lib/catchAsyncError.js";
-import socketConnect from "../../lib/socketConnect.js";
+import { io } from "../../lib/socketConnect.js";
 import getAddressByID from "../../database/Address/getAddressByID.js";
 import createNewBuyDB from "../../database/Buy/createNewBuyDB.js";
 import { getUserOrderCheckoutFromRedis } from "../../redis/order/userCheckout.js";
@@ -13,7 +13,6 @@ const webhookSecretKey = environment.STRIPE_WEBHOOK_SECRET_KEY;
 
 const webhookCheckout = catchAsyncError(async (request, response) => {
   const sig = request.headers["stripe-signature"];
-  const { io } = socketConnect();
 
   let event;
   try {
@@ -73,6 +72,8 @@ const webhookCheckout = catchAsyncError(async (request, response) => {
 
   const adminUsers = await getAdminUsers();
   console.log("adminUsers", adminUsers);
+
+  console.log("io", io);
 
   adminUsers.forEach((admin) => {
     if (!admin) return;
