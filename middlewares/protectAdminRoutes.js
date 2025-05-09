@@ -2,7 +2,6 @@ import HandleGlobalError from "../lib/HandleGlobalError.js";
 import catchAsyncError from "../lib/catchAsyncError.js";
 import { decrypt } from "../lib/encryptAndDecrypt.js";
 import getUserById from "../database/User/getUserById.js";
-import { setAdminUsersIntoRedis } from "../redis/User/adminUser.js";
 
 const BEARER = "Bearer";
 
@@ -34,8 +33,6 @@ const protectAdminRoutes = catchAsyncError(async (req, res, next) => {
   if (!(findUser.role === "admin" && decoded.role === "admin")) {
     return next(new HandleGlobalError("UnAuthorised Access", 403));
   }
-
-  await setAdminUsersIntoRedis(findUser._id?.toString());
 
   req.userId = findUser._id?.toString();
   req.user = findUser;
