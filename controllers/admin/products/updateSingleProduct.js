@@ -11,6 +11,7 @@ const updateSingleProduct = catchAsyncError(async (req, res, next) => {
     discountPercentage,
     deliveredBy,
     category,
+    thumbnail,
   } = req.body;
 
   if (
@@ -20,8 +21,7 @@ const updateSingleProduct = catchAsyncError(async (req, res, next) => {
     !price ||
     !discountPercentage ||
     !deliveredBy ||
-    !category ||
-    !category?._id
+    !category
   ) {
     return next(new HandleGlobalError("all Field is not provided", 404));
   }
@@ -33,8 +33,12 @@ const updateSingleProduct = catchAsyncError(async (req, res, next) => {
     price: parseFloat(price),
     discountPercentage: parseFloat(discountPercentage),
     deliveredBy: parseFloat(deliveredBy),
-    category: category?._id,
+    category: category,
   };
+
+  if (thumbnail) {
+    obj.thumbnail = thumbnail;
+  }
 
   const response = await updateProductDB(_id, obj);
 

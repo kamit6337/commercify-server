@@ -6,10 +6,9 @@ import {
 
 const geAllCategoryDB = async () => {
   const get = await getAllCategoryRedis();
-
   if (get) return get;
 
-  const allCategory = await Category.find().lean();
+  const allCategory = await Category.find().sort("-createdAt").lean();
 
   await setAllCategoryRedis(allCategory);
 
