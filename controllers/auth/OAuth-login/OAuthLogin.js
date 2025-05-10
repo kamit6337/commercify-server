@@ -12,6 +12,8 @@ import adminEmailList from "../../../data/adminEmailList.js";
 const OAuthLogin = async (req, res, next) => {
   try {
     if (!req.user) {
+      console.log("req.user", req.user);
+
       res.redirect(`${environment.CLIENT_URL}/oauth`);
       return;
     }
@@ -23,6 +25,8 @@ const OAuthLogin = async (req, res, next) => {
     } = req.user;
 
     let findUser = await getUserByEmail(email);
+
+    console.log("findUser", findUser);
 
     if (!findUser) {
       // MARK: IF NOT FIND USER
