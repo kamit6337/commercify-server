@@ -11,9 +11,8 @@ import adminEmailList from "../../../data/adminEmailList.js";
 // NOTE: LOGIN SUCCESS
 const OAuthLogin = async (req, res, next) => {
   try {
+    console.log("req.user", req.user);
     if (!req.user) {
-      console.log("req.user", req.user);
-
       res.redirect(`${environment.CLIENT_URL}/oauth`);
       return;
     }
