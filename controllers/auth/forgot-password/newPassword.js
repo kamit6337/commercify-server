@@ -26,7 +26,7 @@ const newPassword = catchAsyncError(async (req, res, next) => {
     passwordLastUpdated: Date.now(),
   };
 
-  await patchUserProfile(findUser.id.toString(), obj);
+  await patchUserProfile(userId, obj);
 
   await deleteKeyFromRedis(resetToken);
 

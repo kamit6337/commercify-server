@@ -30,7 +30,7 @@ const forgotPassword = catchAsyncError(async (req, res, next) => {
   const url = `${environment.CLIENT_URL}/newPassword?resetToken=${secretToken}`;
 
   const html = resetPasswordLinkTemplate(url);
-  await sendingEmail(email, "OTP for verification", html);
+  await sendingEmail(email, "Reset Password", html);
 
   await setUserIdIntoRedis(secretToken, findUser._id);
 

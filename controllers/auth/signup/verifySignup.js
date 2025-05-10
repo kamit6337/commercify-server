@@ -16,7 +16,7 @@ const verifySignup = catchAsyncError(async (req, res, next) => {
 
   await verifyUserOtp(email, otp);
 
-  const userData = await getUserSignUpDataRedis();
+  const userData = await getUserSignUpDataRedis(email);
 
   if (!userData) {
     return next(
