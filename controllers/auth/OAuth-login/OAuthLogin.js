@@ -1,6 +1,4 @@
 import { environment } from "../../../utils/environment.js";
-import HandleGlobalError from "../../../lib/HandleGlobalError.js";
-import catchAsyncError from "../../../lib/catchAsyncError.js";
 import { encrypt } from "../../../lib/encryptAndDecrypt.js";
 import getUserByEmail from "../../../database/User/getUserByEmail.js";
 import postCreateUser from "../../../database/User/postCreateUser.js";
