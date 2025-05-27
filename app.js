@@ -70,7 +70,7 @@ app.use("/payment", protectRoute, paymentRouter);
 app.use("/stripe", stripeRouter);
 app.use("/search", searchRouter);
 app.use("/additional", additionalRouter);
-app.use("/admin", protectAdminRoutes, adminRouter);
+app.use("/admin", adminRouter);
 app.use("/file", protectAdminRoutes, fileRouter);
 
 // NOTE: UNIDENTIFIED ROUTES

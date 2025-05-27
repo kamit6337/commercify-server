@@ -1,6 +1,10 @@
 import Buy from "../../models/BuyModel.js";
 
-const getOrderStatusDB = async (time = "month") => {
+const getOrderStatusDB = async (time) => {
+  if (!time) {
+    throw new Error("Time is not provided");
+  }
+
   const now = new Date();
   const startDate = new Date(now);
 
@@ -8,6 +12,10 @@ const getOrderStatusDB = async (time = "month") => {
     startDate.setDate(startDate.getDate() - 1);
   } else if (time === "month") {
     startDate.setMonth(startDate.getMonth() - 1);
+  } else if (time === "year") {
+    startDate.setFullYear(startDate.getFullYear() - 1);
+  } else if (time === "6month") {
+    startDate.setMonth(startDate.getMonth() - 6);
   }
 
   const result = await Buy.aggregate([
