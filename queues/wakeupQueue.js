@@ -4,12 +4,12 @@ import redisClient from "../redis/redisClient.js";
 // BullMQ connection — don't use this for native Redis commands
 const bullConnection = redisClient.duplicate();
 
-const orderQueue = new Queue("new-order", { connection: bullConnection });
+const wakeupQueue = new Queue("wakeup-notify", { connection: bullConnection });
 
-const addNewOrder = async (orderId, stripeId) => {
-  await orderQueue.add(
+const addWakeupNotfiy = async () => {
+  await wakeupQueue.add(
     `notify-${orderId}`,
-    { orderId, stripeId },
+    { hello: "world" },
     {
       attempts: 3, // total 5 tries (1 original + 4 retries)
       backoff: {
@@ -20,4 +20,4 @@ const addNewOrder = async (orderId, stripeId) => {
   );
 };
 
-export default addNewOrder;
+export default addWakeupNotfiy;

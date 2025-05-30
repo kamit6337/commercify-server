@@ -1,13 +1,7 @@
 import stripe from "stripe";
 import { environment } from "../../utils/environment.js";
 import catchAsyncError from "../../lib/catchAsyncError.js";
-import getAddressByID from "../../database/Address/getAddressByID.js";
-import createNewBuyDB from "../../database/Buy/createNewBuyDB.js";
-import {
-  deleteUserOrderByOrderId,
-  getUserOrderCheckoutFromRedis,
-} from "../../redis/order/userCheckout.js";
-import createNewAddressDB from "../../database/Address/createNewAddressDB.js";
+import { deleteUserOrderByOrderId } from "../../redis/order/userCheckout.js";
 import { redisPub } from "../../redis/redisClient.js";
 import addNewOrder from "../../queues/orderQueue.js";
 
@@ -48,48 +42,8 @@ const webhookCheckout = catchAsyncError(async (request, response) => {
 
     await addNewOrder(CHECKOUT_ORDER_ID, stripeId);
 
-    // const data = await getUserOrderCheckoutFromRedis(CHECKOUT_ORDER_ID);
-
-    // if (!data) {
-    //   response.status(403).json("Error occur in storing data");
-    // }
-
-    // const { products, address: addressId, orderId } = data;
-
-    // const findAddress = await getAddressByID(addressId);
-
-    // console.log("findAddress", findAddress);
-
-    // const newAddressObj = {
-    //   ...findAddress,
-    // };
-
-    // delete newAddressObj._id;
-    // delete newAddressObj.user;
-    // delete newAddressObj.createdAt;
-    // delete newAddressObj.updatedAt;
-
-    // const addNewAddress = await createNewAddressDB(newAddressObj);
-
-    // console.log("addNewAddress", addNewAddress);
-
-    // const buyObjs = products.map((product) => {
-    //   return {
-    //     ...product,
-    //     orderId,
-    //     stripeId,
-    //     user: client_reference_id,
-    //     address: addNewAddress._id,
-    //   };
-    // });
-
-    // const result = await createNewBuyDB(buyObjs, addNewAddress);
-
     await redisPub.publish("new-order", CHECKOUT_ORDER_ID);
 
-    // console.log("result", result);
-
-    // Return a 200 response to acknowledge receipt of the event
     response.status(200).send();
     return;
   }
