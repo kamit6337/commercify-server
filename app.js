@@ -25,6 +25,7 @@ import joinRooms from "./socket/joinRooms.js";
 import onDisconnect from "./socket/onDisconnect.js";
 import socketAuthMiddleware from "./middlewares/socketAuthMiddleware.js";
 import "./redis/Pub-Sub/newOrder.js";
+import addWakeupNotfiy from "./queues/wakeupQueue.js";
 
 // MARK: WEBHOOK-CHECKOUT
 app.post(
@@ -57,6 +58,7 @@ io.on("connection", (socket) => {
 
 // NOTE: GLOBAL MIDDLEWARES
 globalMiddlewares(app);
+await addWakeupNotfiy();
 
 // NOTE: DIFFERENT ROUTES
 app.use("/auth", authRouter);

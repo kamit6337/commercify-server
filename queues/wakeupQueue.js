@@ -8,7 +8,7 @@ const wakeupQueue = new Queue("wakeup-notify", { connection: bullConnection });
 
 const addWakeupNotfiy = async () => {
   await wakeupQueue.add(
-    `notify-${orderId}`,
+    `notify`,
     { hello: "world" },
     {
       attempts: 3, // total 5 tries (1 original + 4 retries)

@@ -9,7 +9,6 @@ import getAddressByID from "../../database/Address/getAddressByID.js";
 import getProductsFromIdsDB from "../../database/Products/getProductsFromIdsDB.js";
 import getExchange from "../additional/getExchange.js";
 import { setUserOrderCheckoutIntoRedis } from "../../redis/order/userCheckout.js";
-import addWakeupNotfiy from "../../queues/wakeupQueue.js";
 
 const Stripe = stripe(environment.STRIPE_SECRET_KEY);
 
@@ -23,8 +22,6 @@ const makePaymentSession = catchAsyncError(async (req, res, next) => {
   if (!products || !addressId || !code || !symbol) {
     return next(new HandleGlobalError("Not provide all fields", 404));
   }
-
-  await addWakeupNotfiy();
 
   const allExchange = await getExchange();
   const exchangeRate = Math.trunc(allExchange[code]);
