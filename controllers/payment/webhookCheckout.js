@@ -35,7 +35,7 @@ const webhookCheckout = catchAsyncError(async (request, response) => {
 
     await deleteUserOrderByOrderId(CHECKOUT_ORDER_ID);
 
-    response.send("Error occur, payment failed");
+    response.status(404).send("Error occur, payment failed");
     return;
   }
 
@@ -90,10 +90,11 @@ const webhookCheckout = catchAsyncError(async (request, response) => {
     // console.log("result", result);
 
     // Return a 200 response to acknowledge receipt of the event
-    response.send();
+    response.status(200).send();
+    return;
   }
 
-  response.send("Error Occur", event.type);
+  response.status(404).send("Error Occur");
 });
 
 export default webhookCheckout;

@@ -7,6 +7,9 @@ const bullConnection = redisClient.duplicate();
 const orderQueue = new Queue("new-order", { connection: bullConnection });
 
 const addNewOrder = async (orderId, stripeId) => {
+  console.log("orderId", orderId);
+  console.log("stripeId", stripeId);
+
   await orderQueue.add(
     `notify-${orderId}`,
     { orderId, stripeId },

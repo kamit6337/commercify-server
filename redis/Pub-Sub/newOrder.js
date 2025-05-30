@@ -13,11 +13,15 @@ redisSub.on("message", async (channel, message) => {
 
   const orderId = message;
 
+  console.log("orderid from Pubsub", orderId);
+
   let buys = await getUserOrderCheckoutFromRedis(orderId);
 
   if (!buys) {
     buys = await buysFromOrderId(orderId);
   }
+
+  console.log("buys from pub-sub", buys);
 
   const adminUsers = await getAdminUsers();
 
