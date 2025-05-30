@@ -31,11 +31,7 @@ const makePaymentSession = catchAsyncError(async (req, res, next) => {
   const productIds = products.map((obj) => obj.id);
   const findProducts = await getProductsFromIdsDB(productIds);
 
-  const willBuyProducts = {
-    products: [],
-    address: addressId,
-    orderId: CHECKOUT_ORDER_ID,
-  };
+  const willBuyProducts = [];
 
   let lineItems = findProducts.map((product) => {
     const {
@@ -62,14 +58,24 @@ const makePaymentSession = catchAsyncError(async (req, res, next) => {
 
     // Use findOneAndUpdate to create the Buy and populate the product and address fields in one go
     const obj = {
-      product: _id,
+      product: product,
+      user: userId,
+      orderId: CHECKOUT_ORDER_ID,
       price: Number(discountedPriceWithoutExchangeRate),
-      quantity: Number(findQuantity.quantity),
       exchangeRate: exchangeRate,
+      quantity: Number(findQuantity.quantity),
+      address: findAddress,
+      isDelivered: false,
       deliveredDate: dateInMilli(Number(deliveredBy)),
+      isCancelled: false,
+      reasonForCancelled: "",
+      isReturned: false,
+      reasonForReturned: "",
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
     };
 
-    willBuyProducts.products.push(obj);
+    willBuyProducts.push(obj);
 
     return {
       price_data: {
@@ -129,7 +135,7 @@ const makePaymentSession = catchAsyncError(async (req, res, next) => {
     },
     line_items: lineItems,
     metadata: {
-      willBuyProducts: CHECKOUT_ORDER_ID,
+      checkout_order_id: CHECKOUT_ORDER_ID,
     },
   });
 

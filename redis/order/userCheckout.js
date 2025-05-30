@@ -18,3 +18,10 @@ export const setUserOrderCheckoutIntoRedis = async (orderId, order) => {
     3600
   );
 };
+
+export const deleteUserOrderByOrderId = async (orderId) => {
+  if (!orderId) return;
+
+  const result = await redisClient.del(`Order-Checkout:${orderId}`);
+  return result === 1;
+};

@@ -1,6 +1,7 @@
 import catchAsyncError from "../../lib/catchAsyncError.js";
 import HandleGlobalError from "../../lib/HandleGlobalError.js";
 import buysFromOrderId from "../../database/Buy/buysFromOrderId.js";
+import { getUserOrderCheckoutFromRedis } from "../../redis/order/userCheckout.js";
 
 const afterSuccessfulPayment = catchAsyncError(async (req, res, next) => {
   const { orderId } = req.query;
@@ -9,9 +10,15 @@ const afterSuccessfulPayment = catchAsyncError(async (req, res, next) => {
     return next(new HandleGlobalError("Please provide ID", 404));
   }
 
-  const buys = await buysFromOrderId(orderId);
+  const buysFromRedis = await getUserOrderCheckoutFromRedis(orderId);
 
-  res.json(buys);
+  if (!buysFromRedis) {
+    const buysFromDB = await buysFromOrderId(orderId);
+
+    res.json(buysFromDB);
+  }
+
+  res.json(buysFromRedis);
 });
 
 export default afterSuccessfulPayment;
