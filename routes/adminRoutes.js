@@ -12,10 +12,12 @@ import getAllDelivered from "../controllers/admin/order-status/getAllDelivered.j
 import getAllCancelled from "../controllers/admin/order-status/getAllCancelled.js";
 import getAllReturned from "../controllers/admin/order-status/getAllReturned.js";
 import protectAdminRoutes from "../middlewares/protectAdminRoutes.js";
+import getOrdersCount from "../controllers/admin/getOrdersCount.js";
 
 const router = express.Router();
 
 router.get("/", getAdminCountDetails);
+router.get("/orders", getOrdersCount);
 
 router
   .route("/products")

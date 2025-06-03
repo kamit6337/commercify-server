@@ -1,7 +1,10 @@
+import getAddressByID from "../../../database/Address/getAddressByID.js";
 import userBuyUpdateDB from "../../../database/Buy/userBuyUpdateDB.js";
+import getSingleProductDB from "../../../database/Products/getSingleProductDB.js";
 import catchAsyncError from "../../../lib/catchAsyncError.js";
 import HandleGlobalError from "../../../lib/HandleGlobalError.js";
 import { io } from "../../../lib/socketConnect.js";
+import addOrderStatus from "../../../queues/orderStatusQueue.js";
 
 const updateUserCheckoutOrder = catchAsyncError(async (req, res, next) => {
   const { id } = req.body;
@@ -14,13 +17,22 @@ const updateUserCheckoutOrder = catchAsyncError(async (req, res, next) => {
     deliveredDate: Date.now(),
   };
 
-  const response = await userBuyUpdateDB(id, obj);
+  const updateBuy = await userBuyUpdateDB(id, obj);
 
-  console.log("response", response);
+  // const address = await getAddressByID(updateBuy.address?.toString());
+  // const product = await getSingleProductDB(updateBuy.product?.toString());
 
-  io.to(response.user).emit("update-deliver", response);
+  // const buyObj = {
+  //   ...updateBuy,
+  //   product,
+  //   address,
+  // };
 
-  res.json(response);
+  await addOrderStatus(updateBuy._id);
+
+  io.to(updateBuy.user).emit("update-deliver", updateBuy);
+
+  res.json(updateBuy);
 });
 
 export default updateUserCheckoutOrder;

@@ -1,6 +1,4 @@
 import Buy from "../../models/BuyModel.js";
-import getAddressByID from "../Address/getAddressByID.js";
-import getSingleProductDB from "../Products/getSingleProductDB.js";
 
 const userBuyUpdateDB = async (buyId, obj) => {
   const buy = await Buy.findOneAndUpdate(
@@ -13,21 +11,9 @@ const userBuyUpdateDB = async (buyId, obj) => {
     {
       new: true,
     }
-  );
+  ).lean();
 
-  const address = await getAddressByID(buy.address?.toString());
-
-  const product = await getSingleProductDB(buy.product?.toString());
-
-  const parseBuy = JSON.parse(JSON.stringify(buy));
-
-  const buyObj = {
-    ...parseBuy,
-    product,
-    address,
-  };
-
-  return buyObj;
+  return buy;
 };
 
 export default userBuyUpdateDB;

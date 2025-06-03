@@ -1,30 +1,16 @@
 import Rating from "../../models/RatingModel.js";
 import { setSingleRatingInRedis } from "../../redis/Ratings/rating.js";
 
-const createNewRatingDB = async (user, obj) => {
+const createNewRatingDB = async (obj) => {
   const createRating = await Rating.create({
     ...obj,
   });
 
-  const { _id, rate, title, comment, createdAt, updatedAt } = createRating;
+  const newRating = JSON.parse(JSON.stringify(createRating));
 
-  const createRatingData = {
-    _id,
-    rate,
-    title,
-    comment,
-    createdAt,
-    updatedAt,
-    user: {
-      _id: user._id,
-      name: user.name,
-      photo: user.photo,
-    },
-  };
+  await setSingleRatingInRedis(obj.product, newRating);
 
-  await setSingleRatingInRedis(obj.product, createRatingData);
-
-  return createRatingData;
+  return newRating;
 };
 
 export default createNewRatingDB;

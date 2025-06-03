@@ -14,6 +14,8 @@ const changePriceDiscountByExchangeRate = (
   );
 
   return {
+    price,
+    exchangeRate,
     exchangeRatePrice,
     roundDiscountPercent,
     discountedPrice,

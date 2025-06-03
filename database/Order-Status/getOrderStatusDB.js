@@ -18,16 +18,7 @@ const getOrderStatusDB = async (time) => {
     startDate.setMonth(startDate.getMonth() - 6);
   }
 
-  const result = await Buy.aggregate([
-    {
-      $match: {
-        createdAt: {
-          $lt: now,
-          $gte: startDate,
-        },
-      },
-    },
-
+  const pipeline = [
     {
       $group: {
         _id: null,
@@ -65,7 +56,20 @@ const getOrderStatusDB = async (time) => {
         returned: { $sum: { $cond: ["$isReturned", 1, 0] } },
       },
     },
-  ]);
+  ];
+
+  if (time !== "all") {
+    pipeline.unshift({
+      $match: {
+        createdAt: {
+          $lt: now,
+          $gte: startDate,
+        },
+      },
+    });
+  }
+
+  const result = await Buy.aggregate(pipeline);
 
   return (
     result[0] || {

@@ -2,13 +2,14 @@ import stripe from "stripe";
 import catchAsyncError from "../../lib/catchAsyncError.js";
 import { environment } from "../../utils/environment.js";
 import HandleGlobalError from "../../lib/HandleGlobalError.js";
-import changePriceDiscountByExchangeRate from "../../utils/javaScript/changePriceDiscountByExchangeRate.js";
 import dateInMilli from "../../utils/javaScript/dateInMilli.js";
 import generateSecureString from "../../utils/javaScript/generateSecureString.js";
 import getAddressByID from "../../database/Address/getAddressByID.js";
 import getProductsFromIdsDB from "../../database/Products/getProductsFromIdsDB.js";
 import getExchange from "../additional/getExchange.js";
 import { setUserOrderCheckoutIntoRedis } from "../../redis/order/userCheckout.js";
+import getCountryByIdDB from "../../database/Additional/getCountryByIdDB.js";
+import getZeroStocksByProductIdsDB from "../../database/Stock/getZeroStocksByProductIdsDB.js";
 
 const Stripe = stripe(environment.STRIPE_SECRET_KEY);
 
@@ -17,21 +18,39 @@ const makePaymentSession = catchAsyncError(async (req, res, next) => {
   const userId = req.userId;
   const CHECKOUT_ORDER_ID = generateSecureString();
 
-  const { products, address: addressId, code, symbol } = req.body;
+  const { products, address: addressId, currency_code, countryId } = req.body;
 
-  if (!products || !addressId || !code || !symbol) {
+  if (!products || !addressId || !currency_code || !countryId) {
     return next(new HandleGlobalError("Not provide all fields", 404));
   }
 
+  const productIds = products.map((obj) => obj.id);
+
+  const zeroStocks = await getZeroStocksByProductIdsDB(productIds);
+
+  if (zeroStocks.length !== 0) {
+    const productTitle = zeroStocks
+      .map((stock) => stock.product.title)
+      .join(", ");
+
+    return next(
+      new HandleGlobalError(`Product Unavailable. \n ${productTitle}`, 404)
+    );
+  }
+
   const allExchange = await getExchange();
-  const exchangeRate = Math.trunc(allExchange[code]);
+
+  const findCountry = await getCountryByIdDB(countryId);
+
+  const exchangeRate = Math.trunc(allExchange[currency_code]);
 
   const findAddress = await getAddressByID(addressId);
 
-  const productIds = products.map((obj) => obj.id);
   const findProducts = await getProductsFromIdsDB(productIds);
 
   const willBuyProducts = [];
+
+  let totalDeliveryCharge = 0;
 
   let lineItems = findProducts.map((product) => {
     const {
@@ -39,30 +58,26 @@ const makePaymentSession = catchAsyncError(async (req, res, next) => {
       title,
       description,
       price,
-      discountPercentage,
       thumbnail,
       deliveredBy,
+      deliveryCharge,
     } = product;
+
+    totalDeliveryCharge += deliveryCharge;
 
     const findQuantity = products.find((obj) => obj.id === String(_id));
 
-    const { discountedPrice, exchangeRatePrice, roundDiscountPercent } =
-      changePriceDiscountByExchangeRate(
-        price,
-        discountPercentage,
-        exchangeRate
-      );
+    const { discountedPrice, price: priceInUSD } = price[currency_code];
 
-    const discountedPriceWithoutExchangeRate =
-      (price * (100 - Math.trunc(discountPercentage))) / 100;
-
-    // Use findOneAndUpdate to create the Buy and populate the product and address fields in one go
     const obj = {
       product: product,
       user: userId,
+      isReviewed: false,
       orderId: CHECKOUT_ORDER_ID,
-      price: Number(discountedPriceWithoutExchangeRate),
+      price: priceInUSD,
+      buyPrice: discountedPrice,
       exchangeRate: exchangeRate,
+      country: findCountry,
       quantity: Number(findQuantity.quantity),
       address: findAddress,
       isDelivered: false,
@@ -79,7 +94,7 @@ const makePaymentSession = catchAsyncError(async (req, res, next) => {
 
     return {
       price_data: {
-        currency: code,
+        currency: currency_code,
         unit_amount: discountedPrice * 100,
         product_data: {
           name: title,
@@ -91,11 +106,16 @@ const makePaymentSession = catchAsyncError(async (req, res, next) => {
     };
   });
 
-  const deliveryCharge = Math.round(lineItems.length * exchangeRate * 0.48); // 4 dollars
+  // const deliveryCharge = findProducts.reduce((acc, product) => {
+  //   acc += product.deliveryCharge;
+  // }, 0);
+
+  // const deliveryCharge = Math.round(lineItems.length * exchangeRate * 0.48);
+  // 4 dollars
   const delieveryObj = {
     price_data: {
-      currency: code,
-      unit_amount: deliveryCharge * 100,
+      currency: currency_code,
+      unit_amount: totalDeliveryCharge * exchangeRate * 100,
       product_data: {
         name: "Delivery Charges",
         description: `Delivery charge for the above ${lineItems.length} products`,

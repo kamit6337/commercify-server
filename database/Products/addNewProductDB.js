@@ -1,5 +1,6 @@
 import Product from "../../models/ProductModel.js";
 import { setNewProductIntoRedis } from "../../redis/Products/LatestProducts.js";
+import { productPriceFromRedis } from "../../redis/Products/ProductPrice.js";
 import getCategoryByIdDB from "../Category/getCategoryByIdDB.js";
 
 const addNewProductDB = async (obj) => {
@@ -9,11 +10,18 @@ const addNewProductDB = async (obj) => {
 
   const findCategory = await getCategoryByIdDB(parseProduct.category);
 
+  const productPrice = await productPriceFromRedis(
+    parseProduct._id,
+    parseProduct.price,
+    parseProduct.discountPercentage
+  );
+
   const modifyProduct = {
     ...parseProduct,
     category: findCategory,
     ratingCount: 0,
     avgRating: 0,
+    price: productPrice,
   };
 
   await setNewProductIntoRedis(modifyProduct);

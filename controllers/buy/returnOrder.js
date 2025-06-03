@@ -18,14 +18,6 @@ const returnOrder = catchAsyncError(async (req, res, next) => {
 
   const result = await userBuyUpdateDB(buyId, obj);
 
-  const adminUsers = await getAdminUsers();
-  console.log("adminUsers", adminUsers);
-
-  adminUsers.forEach((admin) => {
-    if (!admin) return;
-    io.to(admin).emit("order-return", result);
-  });
-
   res.json(result);
 });
 

@@ -1,5 +1,9 @@
 import mongoose from "mongoose";
 import { environment } from "../utils/environment.js";
+import Country from "../models/CountryModel.js";
+import Product from "../models/ProductModel.js";
+import Buy from "../models/BuyModel.js";
+import Stock from "../models/StockModel.js";
 
 // Connect to MongoDB
 mongoose.connect(environment.MONGO_DB_URI);
@@ -14,7 +18,20 @@ mongoose.connection.on("connected", async () => {
   console.log("Connected to MongoDB");
 
   try {
-    console.log("update");
+    const products = await Product.find().lean();
+
+    const stocks = products.map((product) => {
+      const randomInt = Math.floor(Math.random() * (50 - 10 + 1)) + 10;
+
+      return {
+        product: product._id,
+        stock: randomInt,
+      };
+    });
+
+    const result = await Stock.insertMany(stocks);
+
+    console.log(result);
   } catch (error) {
     console.error("Error occur in update:", error);
   } finally {

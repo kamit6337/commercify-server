@@ -2,6 +2,8 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const environment = {
+  PROJECT_NAME: process.env.PROJECT_NAME,
+
   PORT: process.env.PORT,
   NODE_ENV: process.env.NODE_ENV,
   CLIENT_URL: process.env.CLIENT_URL,

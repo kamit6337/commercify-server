@@ -11,6 +11,10 @@ const buySchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  isReviewed: {
+    type: Boolean,
+    default: false,
+  },
   orderId: {
     type: String,
     required: true,
@@ -25,8 +29,17 @@ const buySchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  buyPrice: {
+    type: Number,
+    required: true,
+  },
   exchangeRate: {
     type: Number,
+    required: true,
+  },
+  country: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Country",
     required: true,
   },
   quantity: {

@@ -2,7 +2,6 @@ import stripe from "stripe";
 import { environment } from "../../utils/environment.js";
 import catchAsyncError from "../../lib/catchAsyncError.js";
 import { deleteUserOrderByOrderId } from "../../redis/order/userCheckout.js";
-import { redisPub } from "../../redis/redisClient.js";
 import addNewOrder from "../../queues/orderQueue.js";
 
 const Stripe = stripe(environment.STRIPE_SECRET_KEY);
@@ -41,8 +40,6 @@ const webhookCheckout = catchAsyncError(async (request, response) => {
     const CHECKOUT_ORDER_ID = metadata.checkout_order_id;
 
     await addNewOrder(CHECKOUT_ORDER_ID, stripeId);
-
-    await redisPub.publish("new-order", CHECKOUT_ORDER_ID);
 
     response.status(200).send();
     return;

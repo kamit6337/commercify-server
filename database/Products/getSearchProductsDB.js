@@ -1,4 +1,5 @@
 import Product from "../../models/ProductModel.js";
+import { productPriceFromRedis } from "../../redis/Products/ProductPrice.js";
 import {
   getSearchProductsRedis,
   setSearchProductsRedis,
@@ -49,9 +50,24 @@ const getSearchProductsDB = async (q) => {
     },
   ]);
 
-  await setSearchProductsRedis(query, products);
+  if (products.length === 0) return [];
 
-  return products;
+  const modifyProducts = products.map(async (product) => {
+    const productPrice = await productPriceFromRedis(
+      product._id,
+      product.price,
+      product.discountPercentage
+    );
+
+    return {
+      ...JSON.parse(JSON.stringify(product)),
+      price: productPrice,
+    };
+  });
+
+  await setSearchProductsRedis(query, modifyProducts);
+
+  return modifyProducts;
 };
 
 export default getSearchProductsDB;

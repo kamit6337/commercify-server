@@ -1,4 +1,5 @@
 import getProductsFromIdsDB from "../../database/Products/getProductsFromIdsDB.js";
+import getStocksByProductIdsDB from "../../database/Stock/getStocksByProductIdsDB.js";
 import catchAsyncError from "../../lib/catchAsyncError.js";
 import HandleGlobalError from "../../lib/HandleGlobalError.js";
 
@@ -11,7 +12,21 @@ const getProductsFromIds = catchAsyncError(async (req, res, next) => {
 
   const products = await getProductsFromIdsDB(ids);
 
-  res.json(products);
+  const productIds = products.map((product) => product._id);
+  const productStocks = await getStocksByProductIdsDB(productIds);
+
+  const modifyProducts = products.map((product) => {
+    const findStock = productStocks.find(
+      (obj) => obj.product?.toString() === product._id?.toString()
+    );
+
+    return {
+      ...product,
+      stock: findStock.stock,
+    };
+  });
+
+  res.json(modifyProducts);
 });
 
 export default getProductsFromIds;

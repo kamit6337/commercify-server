@@ -24,8 +24,9 @@ import newConnection from "./socket/newConnection.js";
 import joinRooms from "./socket/joinRooms.js";
 import onDisconnect from "./socket/onDisconnect.js";
 import socketAuthMiddleware from "./middlewares/socketAuthMiddleware.js";
-import "./redis/Pub-Sub/newOrder.js";
+import "./redis/Pub-Sub/pubSubListner.js";
 import addWakeupNotfiy from "./queues/wakeupQueue.js";
+import redisClient from "./redis/redisClient.js";
 
 // MARK: WEBHOOK-CHECKOUT
 app.post(
@@ -59,6 +60,7 @@ io.on("connection", (socket) => {
 // NOTE: GLOBAL MIDDLEWARES
 globalMiddlewares(app);
 await addWakeupNotfiy();
+// await redisClient.flushdb();
 
 // NOTE: DIFFERENT ROUTES
 app.use("/auth", authRouter);

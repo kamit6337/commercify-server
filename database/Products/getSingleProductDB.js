@@ -4,6 +4,7 @@ import {
   setSingleProductRedis,
 } from "../../redis/Products/SingleProduct.js";
 import ObjectID from "../../lib/ObjectID.js";
+import { productPriceFromRedis } from "../../redis/Products/ProductPrice.js";
 
 const getSingleProductDB = async (id) => {
   const get = await getSingleProductRedis(id);
@@ -47,9 +48,22 @@ const getSingleProductDB = async (id) => {
     },
   ]);
 
-  await setSingleProductRedis(product[0]);
+  const singleProduct = product[0];
 
-  return product[0];
+  const productPrice = await productPriceFromRedis(
+    singleProduct._id,
+    singleProduct.price,
+    singleProduct.discountPercentage
+  );
+
+  const modifyProduct = {
+    ...JSON.parse(JSON.stringify(singleProduct)),
+    price: productPrice,
+  };
+
+  await setSingleProductRedis(modifyProduct);
+
+  return modifyProduct;
 };
 
 export default getSingleProductDB;

@@ -4,6 +4,7 @@ import {
   setProductFromIdsRedis,
 } from "../../redis/Products/ProductFromIds.js";
 import ObjectID from "../../lib/ObjectID.js";
+import { productPriceFromRedis } from "../../redis/Products/ProductPrice.js";
 
 const getProductsFromIdsDB = async (ids) => {
   const get = await getProductFromIdsRedis(ids);
@@ -49,9 +50,24 @@ const getProductsFromIdsDB = async (ids) => {
     },
   ]);
 
-  await setProductFromIdsRedis(products);
+  if (products.length === 0) return [];
 
-  return products;
+  const modifyProducts = products.map(async (product) => {
+    const productPrice = await productPriceFromRedis(
+      product._id,
+      product.price,
+      product.discountPercentage
+    );
+
+    return {
+      ...JSON.parse(JSON.stringify(product)),
+      price: productPrice,
+    };
+  });
+
+  await setProductFromIdsRedis(modifyProducts);
+
+  return modifyProducts;
 };
 
 export default getProductsFromIdsDB;

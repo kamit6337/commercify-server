@@ -4,8 +4,9 @@ import {
   setCaterogyProductsRedis,
 } from "../../redis/Category/categoryProducts.js";
 import ObjectID from "../../lib/ObjectID.js";
+import { productPriceFromRedis } from "../../redis/Products/ProductPrice.js";
 
-const getCaterogyProductsDB = async (categoryId, page) => {
+const getCategoryProductsDB = async (categoryId, page) => {
   const limit = 10;
   const skip = (page - 1) * limit;
 
@@ -63,9 +64,26 @@ const getCaterogyProductsDB = async (categoryId, page) => {
     },
   ]);
 
-  await setCaterogyProductsRedis(categoryId, products);
+  if (products.length === 0) return [];
 
-  return products;
+  const modifyProducts = await Promise.all(
+    products.map(async (product) => {
+      const productPrice = await productPriceFromRedis(
+        product._id,
+        product.price,
+        product.discountPercentage
+      );
+
+      return {
+        ...JSON.parse(JSON.stringify(product)),
+        price: productPrice,
+      };
+    })
+  );
+
+  await setCaterogyProductsRedis(categoryId, modifyProducts);
+
+  return modifyProducts;
 };
 
-export default getCaterogyProductsDB;
+export default getCategoryProductsDB;

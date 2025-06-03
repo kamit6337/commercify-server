@@ -3,6 +3,7 @@ import {
   getLatestProductsRedis,
   setLatestProductsRedis,
 } from "../../redis/Products/LatestProducts.js";
+import { productPriceFromRedis } from "../../redis/Products/ProductPrice.js";
 
 const getLatestProductsDB = async (page) => {
   const limit = 10;
@@ -57,9 +58,26 @@ const getLatestProductsDB = async (page) => {
     },
   ]);
 
-  await setLatestProductsRedis(products);
+  if (products.length === 0) return [];
 
-  return products;
+  const modifyProducts = await Promise.all(
+    products.map(async (product) => {
+      const productPrice = await productPriceFromRedis(
+        product._id,
+        product.price,
+        product.discountPercentage
+      );
+
+      return {
+        ...JSON.parse(JSON.stringify(product)),
+        price: productPrice,
+      };
+    })
+  );
+
+  await setLatestProductsRedis(modifyProducts);
+
+  return modifyProducts;
 };
 
 export default getLatestProductsDB;
