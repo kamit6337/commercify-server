@@ -4,7 +4,7 @@ import getSingleProductDB from "../../../database/Products/getSingleProductDB.js
 import catchAsyncError from "../../../lib/catchAsyncError.js";
 import HandleGlobalError from "../../../lib/HandleGlobalError.js";
 import { io } from "../../../lib/socketConnect.js";
-import addOrderStatus from "../../../queues/orderStatusQueue.js";
+import addOrderStatus from "../../../queues/orders/orderStatusQueue.js";
 
 const updateUserCheckoutOrder = catchAsyncError(async (req, res, next) => {
   const { id } = req.body;

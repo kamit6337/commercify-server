@@ -1,17 +1,15 @@
 import { Queue } from "bullmq";
-import redisClient from "../redis/redisClient.js";
+import redisClient from "../../redis/redisClient.js";
 
 // BullMQ connection — don't use this for native Redis commands
 const bullConnection = redisClient.duplicate();
 
-const productNotifyQueue = new Queue("product-notify", {
-  connection: bullConnection,
-});
+const orderQueue = new Queue("new-order", { connection: bullConnection });
 
-const addNewProductNotify = async (productId, notifyType) => {
-  await productNotifyQueue.add(
-    `notify`,
-    { productId, notifyType },
+const addNewOrder = async (orderId, stripeId) => {
+  await orderQueue.add(
+    `notify-${orderId}`,
+    { orderId, stripeId },
     {
       attempts: 3, // total 5 tries (1 original + 4 retries)
       backoff: {
@@ -22,4 +20,4 @@ const addNewProductNotify = async (productId, notifyType) => {
   );
 };
 
-export default addNewProductNotify;
+export default addNewOrder;

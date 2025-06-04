@@ -2,7 +2,7 @@ import getNotifyCountByProductIdDB from "../../../database/Notify/getNotifyCount
 import updateStockDB from "../../../database/Stock/updateStockDB.js";
 import catchAsyncError from "../../../lib/catchAsyncError.js";
 import HandleGlobalError from "../../../lib/HandleGlobalError.js";
-import addNewProductNotify from "../../../queues/productNotifyQueue.js";
+import addNewProductNotify from "../../../queues/product-notify/productNotifyQueue.js";
 
 const updateProductStock = catchAsyncError(async (req, res, next) => {
   const { productId, stock } = req.body;

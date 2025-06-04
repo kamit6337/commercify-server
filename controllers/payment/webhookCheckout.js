@@ -2,7 +2,7 @@ import stripe from "stripe";
 import { environment } from "../../utils/environment.js";
 import catchAsyncError from "../../lib/catchAsyncError.js";
 import { deleteUserOrderByOrderId } from "../../redis/order/userCheckout.js";
-import addNewOrder from "../../queues/orderQueue.js";
+import addNewOrder from "../../queues/orders/orderQueue.js";
 
 const Stripe = stripe(environment.STRIPE_SECRET_KEY);
 const webhookSecretKey = environment.STRIPE_WEBHOOK_SECRET_KEY;

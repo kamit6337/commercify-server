@@ -1,5 +1,5 @@
 import { Queue } from "bullmq";
-import redisClient from "../redis/redisClient.js";
+import redisClient from "../../redis/redisClient.js";
 
 // BullMQ connection — don't use this for native Redis commands
 const bullConnection = redisClient.duplicate();

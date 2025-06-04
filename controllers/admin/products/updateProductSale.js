@@ -1,7 +1,7 @@
 import updateProductDB from "../../../database/Products/updateProductDB.js";
 import catchAsyncError from "../../../lib/catchAsyncError.js";
 import HandleGlobalError from "../../../lib/HandleGlobalError.js";
-import addNewProductNotify from "../../../queues/productNotifyQueue.js";
+import addNewProductNotify from "../../../queues/product-notify/productNotifyQueue.js";
 
 const updateProductSale = catchAsyncError(async (req, res, next) => {
   const { productId, toggle } = req.body;
