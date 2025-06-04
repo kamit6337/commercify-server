@@ -13,6 +13,8 @@ import getAllCancelled from "../controllers/admin/order-status/getAllCancelled.j
 import getAllReturned from "../controllers/admin/order-status/getAllReturned.js";
 import protectAdminRoutes from "../middlewares/protectAdminRoutes.js";
 import getOrdersCount from "../controllers/admin/getOrdersCount.js";
+import updateProductStock from "../controllers/admin/stock/updateProductStock.js";
+import updateProductSale from "../controllers/admin/products/updateProductSale.js";
 
 const router = express.Router();
 
@@ -25,6 +27,9 @@ router
   .post(protectAdminRoutes, addSingleProduct)
   .patch(protectAdminRoutes, updateSingleProduct);
 
+router.route("/products/sale").patch(protectAdminRoutes, updateProductSale);
+router.route("/products/stock").patch(protectAdminRoutes, updateProductStock);
+
 router
   .route("/category")
   .post(protectAdminRoutes, addNewCategory)
@@ -36,8 +41,6 @@ router.get("/order-status/delivered", getAllDelivered);
 router.get("/order-status/cancelled", getAllCancelled);
 router.get("/order-status/returned", getAllReturned);
 
-router
-  .route("/order-status/deliver")
-  .patch(protectAdminRoutes, updateUserCheckoutOrder);
+router.route("/order-status/deliver").patch(updateUserCheckoutOrder);
 
 export default router;

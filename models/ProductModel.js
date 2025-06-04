@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+import Stock from "./StockModel.js";
 
 const productSchema = new Schema(
   {
@@ -43,6 +44,10 @@ const productSchema = new Schema(
       type: Number,
       default: 0,
     },
+    isReadyToSale: {
+      type: Boolean,
+      default: true,
+    },
     images: [
       {
         type: String,
@@ -55,6 +60,19 @@ const productSchema = new Schema(
 );
 
 productSchema.index({ title: 1, category: 1 });
+
+productSchema.post("save", async (doc, next) => {
+  try {
+    await Stock.create({
+      product: doc._id,
+      stock: 0,
+    });
+
+    next();
+  } catch (error) {
+    next("Error in creating stock of new product");
+  }
+});
 
 const Product = model("Product", productSchema);
 

@@ -18,18 +18,12 @@ mongoose.connection.on("connected", async () => {
   console.log("Connected to MongoDB");
 
   try {
-    const products = await Product.find().lean();
-
-    const stocks = products.map((product) => {
-      const randomInt = Math.floor(Math.random() * (50 - 10 + 1)) + 10;
-
-      return {
-        product: product._id,
-        stock: randomInt,
-      };
-    });
-
-    const result = await Stock.insertMany(stocks);
+    const result = await Product.updateMany(
+      {},
+      {
+        $set: { isReadyToSale: true },
+      }
+    );
 
     console.log(result);
   } catch (error) {
