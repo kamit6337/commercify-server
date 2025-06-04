@@ -11,9 +11,9 @@
     "crypto": "node update/generateHexCode.js",
     "test": "jest",
     "test:watch": "jest --watchAll",
-    "tag:major": "./git/bump-major.sh",
-    "tag:minor": "./git/bump-minor.sh",
-    "tag:patch": "./git/bump-patch.sh"
+    "tag:major": "node ./git/bump-major.js",
+    "tag:minor": "node ./git/bump-minor.js",
+    "tag:patch": "node ./git/bump-patch.js"
   },
   "keywords": [],
   "author": "",
