@@ -2,6 +2,7 @@ import getNotifyCountByProductIdDB from "../../../database/Notify/getNotifyCount
 import updateStockDB from "../../../database/Stock/updateStockDB.js";
 import catchAsyncError from "../../../lib/catchAsyncError.js";
 import HandleGlobalError from "../../../lib/HandleGlobalError.js";
+import { io } from "../../../lib/socketConnect.js";
 import addNewProductNotify from "../../../queues/product-notify/productNotifyQueue.js";
 
 const updateProductStock = catchAsyncError(async (req, res, next) => {
@@ -20,9 +21,11 @@ const updateProductStock = catchAsyncError(async (req, res, next) => {
     "out_of_stock"
   );
 
-  if (stock > notifyCounts) {
+  if (parseInt(stock) > notifyCounts) {
     await addNewProductNotify(productId, "out_of_stock");
   }
+
+  io.emit("update-stocks", [result]);
 
   res.json(result);
 });

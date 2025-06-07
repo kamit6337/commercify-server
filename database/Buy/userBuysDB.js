@@ -12,6 +12,7 @@ const userBuysDB = async (userId, page) => {
     .limit(limit)
     .populate("product")
     .populate("address")
+    .populate("country")
     .lean();
 
   return userBuys;

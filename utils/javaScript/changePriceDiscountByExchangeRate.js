@@ -1,23 +1,24 @@
 const changePriceDiscountByExchangeRate = (
   price,
   discountPercentage = 0,
-  exchangeRate = 1
+  exchangeRate = 1,
+  currency_code
 ) => {
   const exchangeRatePrice = Math.trunc(price * exchangeRate);
-  const roundDiscountPercent = Math.trunc(discountPercentage);
+  const roundDiscountPercent = discountPercentage;
+
   const discountedPrice = Math.trunc(
     (exchangeRatePrice * (100 - roundDiscountPercent)) / 100
   );
 
-  const discountPercentCost = Math.trunc(
-    (exchangeRatePrice * roundDiscountPercent) / 100
-  );
+  const discountPercentCost = exchangeRatePrice - discountedPrice;
 
   return {
-    price,
+    priceInUSD: price,
+    currency_code,
     exchangeRate,
     exchangeRatePrice,
-    roundDiscountPercent,
+    discountPercent: roundDiscountPercent,
     discountedPrice,
     discountPercentCost,
   };

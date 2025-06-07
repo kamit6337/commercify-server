@@ -8,7 +8,7 @@ const createNewRatingDB = async (obj) => {
 
   const newRating = JSON.parse(JSON.stringify(createRating));
 
-  await setSingleRatingInRedis(obj.product, newRating);
+  // await setSingleRatingInRedis(obj.product, newRating);
 
   return newRating;
 };

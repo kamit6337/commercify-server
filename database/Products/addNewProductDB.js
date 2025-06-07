@@ -24,7 +24,7 @@ const addNewProductDB = async (obj) => {
     price: productPrice,
   };
 
-  await setNewProductIntoRedis(modifyProduct);
+  // await setNewProductIntoRedis(modifyProduct);
 
   return modifyProduct;
 };

@@ -1,5 +1,4 @@
 import Product from "../../models/ProductModel.js";
-import { deleteSingleProductRedis } from "../../redis/Products/SingleProduct.js";
 
 const updateProductDB = async (productId, obj) => {
   const updateProduct = await Product.findOneAndUpdate(
@@ -13,8 +12,6 @@ const updateProductDB = async (productId, obj) => {
       new: true,
     }
   );
-
-  await deleteSingleProductRedis(productId);
 
   return updateProduct;
 };

@@ -9,8 +9,8 @@ import sanitizedQuery from "../../utils/javaScript/sanitizedQuery.js";
 const getSearchProductsDB = async (q) => {
   const query = sanitizedQuery(q);
 
-  const get = await getSearchProductsRedis(query);
-  if (get) return get;
+  // const get = await getSearchProductsRedis(query);
+  // if (get) return get;
 
   const products = await Product.aggregate([
     {
@@ -65,7 +65,7 @@ const getSearchProductsDB = async (q) => {
     };
   });
 
-  await setSearchProductsRedis(query, modifyProducts);
+  // await setSearchProductsRedis(query, modifyProducts);
 
   return modifyProducts;
 };

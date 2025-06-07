@@ -1,45 +1,28 @@
 import getExchange from "../../controllers/additional/getExchange.js";
 import changePriceDiscountByExchangeRate from "../../utils/javaScript/changePriceDiscountByExchangeRate.js";
-import redisClient from "../redisClient.js";
 
 export const productPriceFromRedis = async (
   productId,
   priceInUSD,
+  currency_code,
   discountPercentage = 0
 ) => {
-  if (!productId || !priceInUSD) return;
-
-  const get = await redisClient.get(`Product-Price:${productId}`);
-
-  if (get) {
-    return JSON.parse(get);
-  }
+  if (!productId || !priceInUSD || !currency_code) return;
 
   const exchangeCurr = await getExchange();
-  console.log("exchangeCurr", exchangeCurr);
 
-  const obj = {};
+  const exchangeRate = exchangeCurr[currency_code];
 
-  Object.keys(exchangeCurr).forEach((key) => {
-    const exchangeRate = exchangeCurr[key];
+  if (!exchangeRate) {
+    throw new Error("Wrong Currency Code provided");
+  }
 
-    const value = changePriceDiscountByExchangeRate(
-      priceInUSD,
-      discountPercentage,
-      exchangeRate
-    );
-
-    obj[key] = value;
-  });
-
-  await redisClient.set(
-    `Product-Price:${productId}`,
-    JSON.stringify(obj),
-    "EX",
-    60 * 60
+  const product_price = changePriceDiscountByExchangeRate(
+    priceInUSD,
+    discountPercentage,
+    exchangeRate,
+    currency_code
   );
 
-  console.log("obj", obj);
-
-  return obj;
+  return product_price;
 };

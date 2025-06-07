@@ -9,8 +9,17 @@ const buysFromOrderId = async (orderId) => {
     orderId,
   })
     .sort("-createdAt")
-    .populate("product")
-    .populate("address")
+    .populate([
+      {
+        path: "product",
+      },
+      {
+        path: "address",
+      },
+      {
+        path: "country",
+      },
+    ])
     .lean();
 
   return buys;

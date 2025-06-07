@@ -12,8 +12,8 @@ const getProductRatingsDB = async (productId, page) => {
     throw new Error("Page must be greater than 1");
   }
 
-  const get = await getProductRatingsRedis(productId, page, limit);
-  if (get) return get;
+  // const get = await getProductRatingsRedis(productId, page, limit);
+  // if (get) return get;
 
   const ratings = await Rating.find({
     product: productId,
@@ -27,7 +27,7 @@ const getProductRatingsDB = async (productId, page) => {
     .limit(limit)
     .lean();
 
-  await setProductRatingsIntoRedis(productId, ratings);
+  // await setProductRatingsIntoRedis(productId, ratings);
 
   return ratings;
 };

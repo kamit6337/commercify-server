@@ -9,13 +9,13 @@ const updateStockDB = async (productId, stock) => {
       product: productId,
     },
     {
-      stock,
+      stock: parseInt(stock),
     },
     {
       new: true,
       runValidators: true,
     }
-  );
+  ).lean();
 
   return updateStock;
 };

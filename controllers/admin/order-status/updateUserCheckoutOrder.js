@@ -1,6 +1,4 @@
-import getAddressByID from "../../../database/Address/getAddressByID.js";
 import userBuyUpdateDB from "../../../database/Buy/userBuyUpdateDB.js";
-import getSingleProductDB from "../../../database/Products/getSingleProductDB.js";
 import catchAsyncError from "../../../lib/catchAsyncError.js";
 import HandleGlobalError from "../../../lib/HandleGlobalError.js";
 import { io } from "../../../lib/socketConnect.js";

@@ -20,7 +20,7 @@ const updateRatingDB = async (user, obj) => {
     photo: user.photo,
   };
 
-  await updateProductRatingRedis(update);
+  // await updateProductRatingRedis(update);
 
   return update;
 };

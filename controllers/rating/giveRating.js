@@ -7,9 +7,9 @@ const giveRating = catchAsyncError(async (req, res, next) => {
   const userId = req.userId;
   const user = req.user;
 
-  const { productId, buyId, rate, title, comment } = req.body;
+  const { productId, buyId, rate, title = "", comment = "" } = req.body;
 
-  if (!productId || !buyId || !rate || !title || !comment) {
+  if (!productId || !buyId || !rate) {
     return next(new HandleGlobalError("Please provide all fields", 404));
   }
 

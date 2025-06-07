@@ -1,20 +1,21 @@
 import catchAsyncError from "../../lib/catchAsyncError.js";
-import getLatestProductsDB from "../../database/Products/getLatestProductsDB.js";
-import getStocksByProductIdsDB from "../../database/Stock/getStocksByProductIdsDB.js";
+import HandleGlobalError from "../../lib/HandleGlobalError.js";
+import getCategoryProductsDB from "../../database/Category/getCategoryProductsDB.js";
 import { productPriceFromRedis } from "../../redis/Products/ProductPrice.js";
 import getCategoryByIdDB from "../../database/Category/getCategoryByIdDB.js";
+import getStocksByProductIdsDB from "../../database/Stock/getStocksByProductIdsDB.js";
 import getRatingByProductIds from "../../database/Ratings/getRatingByProductIds.js";
-import HandleGlobalError from "../../lib/HandleGlobalError.js";
 
-const getProducts = catchAsyncError(async (req, res, next) => {
-  const { page = 1, currency_code } = req.query;
+const getCategoryProducts = catchAsyncError(async (req, res, next) => {
+  const { categoryId, currency_code, page = 1 } = req.query;
 
-  if (!currency_code) {
-    return next(new HandleGlobalError("Currency Code is not provided", 404));
+  if (!categoryId || !currency_code) {
+    return next(
+      new HandleGlobalError("CategoryId or currency_code is not provided", 404)
+    );
   }
 
-  // NOTE: IF CATEGORY NAME OR ID IS NOT PROVIDED THEN SEND ALL PRODUCTS
-  const products = await getLatestProductsDB(page);
+  const products = await getCategoryProductsDB(categoryId, page);
 
   if (products.length === 0) {
     res.json([]);
@@ -85,4 +86,4 @@ const getProducts = catchAsyncError(async (req, res, next) => {
   res.json(modifyProducts);
 });
 
-export default getProducts;
+export default getCategoryProducts;

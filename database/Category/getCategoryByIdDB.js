@@ -1,17 +1,25 @@
-import Category from "../../models/CategoryModel.js";
-import { getSingleCategoryFromRedis } from "../../redis/Category/category.js";
+import geAllCategoryDB from "./geAllCategoryDB.js";
 
-const getCategoryByIdDB = async (categoryId) => {
-  if (!categoryId) {
+const getCategoryByIdDB = async (ids) => {
+  if (!Array.isArray(ids) || ids.length === 0) {
     throw new Error("CategoryId is not provided");
   }
 
-  const get = await getSingleCategoryFromRedis(categoryId);
-  if (get) return get;
+  const categoriesFromRedis = await geAllCategoryDB();
 
-  const category = await Category.findOne({ _id: categoryId });
+  const getCategory = ids.map((categoryId) => {
+    return categoriesFromRedis.find(
+      (category) => category._id?.toString() === categoryId?.toString()
+    );
+  });
 
-  return category;
+  const isNullPresent = getCategory.some((category) => !category);
+
+  if (isNullPresent) {
+    throw new Error("Error in getting Categories from Ids");
+  }
+
+  return getCategory;
 };
 
 export default getCategoryByIdDB;

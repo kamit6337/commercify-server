@@ -10,6 +10,7 @@ import getExchange from "../additional/getExchange.js";
 import { setUserOrderCheckoutIntoRedis } from "../../redis/order/userCheckout.js";
 import getCountryByIdDB from "../../database/Additional/getCountryByIdDB.js";
 import getZeroStocksByProductIdsDB from "../../database/Stock/getZeroStocksByProductIdsDB.js";
+import { productPriceFromRedis } from "../../redis/Products/ProductPrice.js";
 
 const Stripe = stripe(environment.STRIPE_SECRET_KEY);
 
@@ -38,84 +39,101 @@ const makePaymentSession = catchAsyncError(async (req, res, next) => {
     );
   }
 
+  const findProducts = await getProductsFromIdsDB(productIds);
+
+  const productsNotReadyToSale = findProducts.filter(
+    (product) => !product.isReadyToSale
+  );
+
+  if (productsNotReadyToSale.length > 0) {
+    const productsTitle = productsNotReadyToSale
+      .map((product) => product.title)
+      .join(", ");
+
+    return next(
+      new HandleGlobalError(`Product Unavailable. \n ${productsTitle}`, 404)
+    );
+  }
+
   const allExchange = await getExchange();
 
   const findCountry = await getCountryByIdDB(countryId);
 
-  const exchangeRate = Math.trunc(allExchange[currency_code]);
+  const exchangeRate = allExchange[currency_code];
 
   const findAddress = await getAddressByID(addressId);
 
-  const findProducts = await getProductsFromIdsDB(productIds);
-
   const willBuyProducts = [];
 
-  let totalDeliveryCharge = 0;
+  const lineItems = await Promise.all(
+    findProducts.map(async (product) => {
+      const {
+        _id,
+        title,
+        description,
+        price,
+        thumbnail,
+        deliveredBy,
+        discountPercentage,
+      } = product;
 
-  let lineItems = findProducts.map((product) => {
-    const {
-      _id,
-      title,
-      description,
-      price,
-      thumbnail,
-      deliveredBy,
-      deliveryCharge,
-    } = product;
+      const findQuantity = products.find((obj) => obj.id === String(_id));
 
-    totalDeliveryCharge += deliveryCharge;
+      const productPrice = await productPriceFromRedis(
+        _id,
+        price,
+        currency_code,
+        discountPercentage
+      );
 
-    const findQuantity = products.find((obj) => obj.id === String(_id));
+      const { discountedPrice, priceInUSD } = productPrice;
 
-    const { discountedPrice, price: priceInUSD } = price[currency_code];
+      const obj = {
+        product: product,
+        user: userId,
+        isReviewed: false,
+        orderId: CHECKOUT_ORDER_ID,
+        price: priceInUSD,
+        buyPrice: discountedPrice,
+        exchangeRate: exchangeRate,
+        country: findCountry,
+        quantity: Number(findQuantity.quantity),
+        address: findAddress,
+        isDelivered: false,
+        deliveredDate: dateInMilli(Number(deliveredBy)),
+        isCancelled: false,
+        reasonForCancelled: "",
+        isReturned: false,
+        reasonForReturned: "",
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      };
 
-    const obj = {
-      product: product,
-      user: userId,
-      isReviewed: false,
-      orderId: CHECKOUT_ORDER_ID,
-      price: priceInUSD,
-      buyPrice: discountedPrice,
-      exchangeRate: exchangeRate,
-      country: findCountry,
-      quantity: Number(findQuantity.quantity),
-      address: findAddress,
-      isDelivered: false,
-      deliveredDate: dateInMilli(Number(deliveredBy)),
-      isCancelled: false,
-      reasonForCancelled: "",
-      isReturned: false,
-      reasonForReturned: "",
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    };
+      willBuyProducts.push(obj);
 
-    willBuyProducts.push(obj);
-
-    return {
-      price_data: {
-        currency: currency_code,
-        unit_amount: discountedPrice * 100,
-        product_data: {
-          name: title,
-          description: description,
-          images: [thumbnail],
+      return {
+        price_data: {
+          currency: currency_code,
+          unit_amount: discountedPrice * 100,
+          product_data: {
+            name: title,
+            description: description,
+            images: [thumbnail],
+          },
         },
-      },
-      quantity: findQuantity.quantity,
-    };
-  });
+        quantity: findQuantity.quantity,
+      };
+    })
+  );
 
-  // const deliveryCharge = findProducts.reduce((acc, product) => {
-  //   acc += product.deliveryCharge;
-  // }, 0);
+  const totalDeliveryCharge = findProducts.reduce((acc, product) => {
+    return (acc += product.deliveryCharge);
+  }, 0);
 
-  // const deliveryCharge = Math.round(lineItems.length * exchangeRate * 0.48);
-  // 4 dollars
   const delieveryObj = {
     price_data: {
       currency: currency_code,
-      unit_amount: totalDeliveryCharge * exchangeRate * 100,
+      unit_amount: Math.round(totalDeliveryCharge * exchangeRate) * 100,
       product_data: {
         name: "Delivery Charges",
         description: `Delivery charge for the above ${lineItems.length} products`,
@@ -123,8 +141,6 @@ const makePaymentSession = catchAsyncError(async (req, res, next) => {
     },
     quantity: 1,
   };
-
-  lineItems = [...lineItems, delieveryObj];
 
   const { address, district, state } = findAddress;
 
@@ -153,7 +169,7 @@ const makePaymentSession = catchAsyncError(async (req, res, next) => {
     invoice_creation: {
       enabled: true,
     },
-    line_items: lineItems,
+    line_items: [...lineItems, delieveryObj],
     metadata: {
       checkout_order_id: CHECKOUT_ORDER_ID,
     },

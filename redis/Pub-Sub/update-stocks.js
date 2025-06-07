@@ -1,4 +1,4 @@
-import getStocksByProductIdsDB from "../../database/Stock/getStocksByProductIdsDB.js";
+import getZeroStocksByProductIdsDB from "../../database/Stock/getZeroStocksByProductIdsDB.js";
 import { io } from "../../lib/socketConnect.js";
 import { redisSub } from "../redisClient.js";
 
@@ -11,7 +11,14 @@ redisSub.on("message", async (channel, message) => {
 
   const productIds = JSON.parse(message);
 
-  const stocks = await getStocksByProductIdsDB(productIds);
+  const zeroStocks = await getZeroStocksByProductIdsDB(productIds);
 
-  io.emit("update-stocks", stocks);
+  if (zeroStocks.length === 0) return;
+
+  const updateZeroStocks = zeroStocks.map((obj) => ({
+    product: obj.product._id,
+    stock: obj.stock,
+  }));
+
+  io.emit("update-stocks", updateZeroStocks);
 });

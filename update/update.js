@@ -4,6 +4,7 @@ import Country from "../models/CountryModel.js";
 import Product from "../models/ProductModel.js";
 import Buy from "../models/BuyModel.js";
 import Stock from "../models/StockModel.js";
+import getExchange from "../controllers/additional/getExchange.js";
 
 // Connect to MongoDB
 mongoose.connect(environment.MONGO_DB_URI);
@@ -18,12 +19,7 @@ mongoose.connection.on("connected", async () => {
   console.log("Connected to MongoDB");
 
   try {
-    const result = await Product.updateMany(
-      {},
-      {
-        $set: { isReadyToSale: true },
-      }
-    );
+    const result = await getExchange();
 
     console.log(result);
   } catch (error) {

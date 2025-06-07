@@ -14,8 +14,8 @@ const afterSuccessfulPayment = catchAsyncError(async (req, res, next) => {
 
   if (!buysFromRedis) {
     const buysFromDB = await buysFromOrderId(orderId);
-
     res.json(buysFromDB);
+    return;
   }
 
   res.json(buysFromRedis);

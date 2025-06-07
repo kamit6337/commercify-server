@@ -6,6 +6,6 @@ const deleteRatingDB = async (productId, ratingId) => {
     _id: ratingId,
   });
 
-  await deleteProductRatingRedis(productId, ratingId);
+  // await deleteProductRatingRedis(productId, ratingId);
 };
 export default deleteRatingDB;
