@@ -65,14 +65,14 @@ await addWakeupNotfiy();
 // NOTE: DIFFERENT ROUTES
 app.use("/auth", authRouter);
 app.use("/user", protectRoute, userRouter);
-app.use("/products", productRouter);
-app.use("/category", categoryRouter);
+app.use("/products", protectRoute, productRouter);
+app.use("/category", protectRoute, categoryRouter);
 app.use("/ratings", protectRoute, ratingRouter);
 app.use("/address", protectRoute, addressRouter);
 app.use("/buy", protectRoute, buyRouter);
 app.use("/payment", protectRoute, paymentRouter);
 app.use("/search", searchRouter);
-app.use("/additional", additionalRouter);
+app.use("/additional", protectRoute, additionalRouter);
 app.use("/admin", adminRouter);
 app.use("/file", protectAdminRoutes, fileRouter);
 app.use("/notify", protectRoute, notifyRouter);

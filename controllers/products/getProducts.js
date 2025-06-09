@@ -1,16 +1,13 @@
 import catchAsyncError from "../../lib/catchAsyncError.js";
 import getLatestProductsDB from "../../database/Products/getLatestProductsDB.js";
-import getStocksByProductIdsDB from "../../database/Stock/getStocksByProductIdsDB.js";
-import { productPriceFromRedis } from "../../redis/Products/ProductPrice.js";
-import getCategoryByIdDB from "../../database/Category/getCategoryByIdDB.js";
-import getRatingByProductIds from "../../database/Ratings/getRatingByProductIds.js";
 import HandleGlobalError from "../../lib/HandleGlobalError.js";
+import getCompleteProductInfo from "./getCompleteProductInfo.js";
 
 const getProducts = catchAsyncError(async (req, res, next) => {
-  const { page = 1, currency_code } = req.query;
+  const { page = 1, countryId } = req.query;
 
-  if (!currency_code) {
-    return next(new HandleGlobalError("Currency Code is not provided", 404));
+  if (!countryId) {
+    return next(new HandleGlobalError("countryId is not provided", 404));
   }
 
   // NOTE: IF CATEGORY NAME OR ID IS NOT PROVIDED THEN SEND ALL PRODUCTS
@@ -21,68 +18,9 @@ const getProducts = catchAsyncError(async (req, res, next) => {
     return;
   }
 
-  const productIds = products.map((product) => product._id?.toString());
+  const productDetails = await getCompleteProductInfo(products, countryId);
 
-  const productsPrice = await Promise.all(
-    products.map(async (product) => {
-      const productPrice = await productPriceFromRedis(
-        product._id,
-        product.price,
-        currency_code,
-        product.discountPercentage
-      );
-
-      return {
-        product: product._id,
-        price: productPrice,
-      };
-    })
-  );
-
-  const productsPriceMap = new Map(
-    productsPrice.map((obj) => [obj.product?.toString(), obj.price])
-  );
-
-  const categoryIds = products.map((product) => product.category?.toString());
-
-  const categories = await getCategoryByIdDB(categoryIds);
-
-  const categoriesMap = new Map(
-    categories.map((category) => [category._id.toString(), category])
-  );
-
-  const productsStock = await getStocksByProductIdsDB(productIds);
-
-  const productsStockMap = new Map(
-    productsStock.map((obj) => [obj.product.toString(), obj.stock])
-  );
-
-  const productsRating = await getRatingByProductIds(productIds);
-
-  const productsRatingMap = new Map(
-    productsRating.map((rating) => [rating.product.toString(), rating])
-  );
-
-  const modifyProducts = products.map((product) => {
-    const productId = product._id?.toString();
-
-    const defaultRating = {
-      product: productId,
-      totalRatings: 0,
-      totalComments: 0,
-      avgRating: 0,
-    };
-
-    return {
-      ...product,
-      price: productsPriceMap.get(productId),
-      category: categoriesMap.get(product.category.toString()),
-      stock: productsStockMap.get(productId) || 0,
-      rating: productsRatingMap.get(productId) || defaultRating,
-    };
-  });
-
-  res.json(modifyProducts);
+  res.json(productDetails);
 });
 
 export default getProducts;

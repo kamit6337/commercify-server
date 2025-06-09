@@ -35,7 +35,10 @@ const makePaymentSession = catchAsyncError(async (req, res, next) => {
       .join(", ");
 
     return next(
-      new HandleGlobalError(`Product Unavailable. \n ${productTitle}`, 404)
+      new HandleGlobalError(
+        `Product Unavailable. \n ${productTitle}. Please try later`,
+        404
+      )
     );
   }
 
@@ -51,7 +54,10 @@ const makePaymentSession = catchAsyncError(async (req, res, next) => {
       .join(", ");
 
     return next(
-      new HandleGlobalError(`Product Unavailable. \n ${productsTitle}`, 404)
+      new HandleGlobalError(
+        `Product Unavailable. \n ${productsTitle}. Please try later`,
+        404
+      )
     );
   }
 

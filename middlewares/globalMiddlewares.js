@@ -11,6 +11,8 @@ import mongoSanitize from "express-mongo-sanitize";
 const globalMiddlewares = (app) => {
   app.use(helmet());
 
+  app.set("trust proxy", true);
+
   app.use(cors(corsOptions));
 
   app.use(express.static("public"));
