@@ -4,7 +4,7 @@ import getRatingByProductIds from "../../database/Ratings/getRatingByProductIds.
 import getProductPriceByProductIdDB from "../../database/ProductPrice/getProductPriceByProductIdDB.js";
 
 const getCompleteProductInfo = async (products, countryId) => {
-  if (!Array.isArray(products) || products.length === 0 || countryId) {
+  if (!Array.isArray(products) || products.length === 0 || !countryId) {
     throw new Error("Products or CountryId is not provided");
   }
 
