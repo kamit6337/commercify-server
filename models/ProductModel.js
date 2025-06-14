@@ -11,18 +11,6 @@ const productSchema = new Schema(
       type: String,
       required: [true, "Please provide description to product"],
     },
-    price: {
-      type: Number,
-      required: [true, "Price should be provided to product"],
-    },
-    deliveryCharge: {
-      type: Number,
-      required: [true, "Delivery Charge should be provided to product"],
-    },
-    discountPercentage: {
-      type: Number,
-      default: 0,
-    },
     deliveredBy: {
       type: Number,
       default: null,
@@ -61,18 +49,18 @@ const productSchema = new Schema(
 
 productSchema.index({ title: 1, category: 1 });
 
-productSchema.post("save", async (doc, next) => {
-  try {
-    await Stock.create({
-      product: doc._id,
-      stock: 0,
-    });
+// productSchema.post("save", async (doc, next) => {
+//   try {
+//     await Stock.create({
+//       product: doc._id,
+//       stock: 0,
+//     });
 
-    next();
-  } catch (error) {
-    next("Error in creating stock of new product");
-  }
-});
+//     next();
+//   } catch (error) {
+//     next("Error in creating stock of new product");
+//   }
+// });
 
 const Product = model("Product", productSchema);
 

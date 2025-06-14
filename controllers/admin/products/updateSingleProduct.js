@@ -1,28 +1,13 @@
+import getCategoryByIdDB from "../../../database/Category/getCategoryByIdDB.js";
 import updateProductDB from "../../../database/Products/updateProductDB.js";
 import catchAsyncError from "../../../lib/catchAsyncError.js";
 import HandleGlobalError from "../../../lib/HandleGlobalError.js";
 
 const updateSingleProduct = catchAsyncError(async (req, res, next) => {
-  const {
-    _id,
-    title,
-    description,
-    price,
-    discountPercentage,
-    deliveredBy,
-    category,
-    thumbnail,
-  } = req.body;
+  const { _id, title, description, deliveredBy, category, thumbnail } =
+    req.body;
 
-  if (
-    !_id ||
-    !title ||
-    !description ||
-    !price ||
-    !discountPercentage ||
-    !deliveredBy ||
-    !category
-  ) {
+  if (!_id || !title || !description || !deliveredBy || !category) {
     return next(new HandleGlobalError("all Field is not provided", 404));
   }
 
@@ -30,8 +15,6 @@ const updateSingleProduct = catchAsyncError(async (req, res, next) => {
     _id,
     title,
     description,
-    price: parseFloat(price),
-    discountPercentage: parseFloat(discountPercentage),
     deliveredBy: parseFloat(deliveredBy),
     category: category,
   };
@@ -40,9 +23,16 @@ const updateSingleProduct = catchAsyncError(async (req, res, next) => {
     obj.thumbnail = thumbnail;
   }
 
-  const response = await updateProductDB(_id, obj);
+  const product = await updateProductDB(_id, obj);
 
-  res.json(response);
+  const categories = await getCategoryByIdDB([product.category]);
+
+  const updateProduct = {
+    ...product,
+    category: categories[0],
+  };
+
+  res.json(updateProduct);
 });
 
 export default updateSingleProduct;

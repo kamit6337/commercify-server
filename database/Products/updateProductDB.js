@@ -11,9 +11,9 @@ const updateProductDB = async (productId, obj) => {
     {
       new: true,
     }
-  );
+  ).lean();
 
-  return updateProduct;
+  return JSON.parse(JSON.stringify(updateProduct));
 };
 
 export default updateProductDB;

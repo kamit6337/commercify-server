@@ -7,6 +7,7 @@ const productPriceSchema = new Schema(
       ref: "Product",
       required: true,
       index: true,
+      unqiue: true,
     },
     country: {
       type: Schema.Types.ObjectId,
