@@ -15,6 +15,7 @@ import protectAdminRoutes from "../middlewares/protectAdminRoutes.js";
 import getOrdersCount from "../controllers/admin/getOrdersCount.js";
 import updateProductStock from "../controllers/admin/stock/updateProductStock.js";
 import updateProductSale from "../controllers/admin/products/updateProductSale.js";
+import deleteSingleProduct from "../controllers/admin/products/deleteSingleProduct.js";
 
 const router = express.Router();
 
@@ -25,7 +26,8 @@ router
   .route("/products")
   .get(getProductsCountDetails)
   .post(protectAdminRoutes, addSingleProduct)
-  .patch(protectAdminRoutes, updateSingleProduct);
+  .patch(protectAdminRoutes, updateSingleProduct)
+  .delete(protectAdminRoutes, deleteSingleProduct);
 
 router.route("/products/sale").patch(protectAdminRoutes, updateProductSale);
 router.route("/products/stock").patch(protectAdminRoutes, updateProductStock);

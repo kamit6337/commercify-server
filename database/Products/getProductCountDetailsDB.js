@@ -1,9 +1,6 @@
 import Category from "../../models/CategoryModel.js";
-import Product from "../../models/ProductModel.js";
 
 const getProductCountDetailsDB = async () => {
-  const allProductsCount = await Product.countDocuments();
-
   const categoryProducts = await Category.aggregate([
     {
       $match: {},
@@ -18,24 +15,19 @@ const getProductCountDetailsDB = async () => {
     },
     {
       $addFields: {
-        categoryProductsCount: { $size: "$categoryProducts" },
+        counts: { $size: "$categoryProducts" },
       },
     },
     {
       $project: {
         _id: 1,
         title: 1,
-        categoryProductsCount: 1,
+        counts: 1,
       },
     },
   ]);
 
-  const result = {
-    products: allProductsCount,
-    categoryProducts,
-  };
-
-  return result;
+  return categoryProducts;
 };
 
 export default getProductCountDetailsDB;
