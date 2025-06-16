@@ -27,6 +27,7 @@ import socketAuthMiddleware from "./middlewares/socketAuthMiddleware.js";
 import "./redis/Pub-Sub/pubSubListner.js";
 import addWakeupNotfiy from "./queues/wakeupQueue.js";
 import redisClient from "./redis/redisClient.js";
+import pingWorker from "./utils/pingWorker.js";
 
 // MARK: WEBHOOK-CHECKOUT
 app.post(
@@ -61,6 +62,12 @@ io.on("connection", (socket) => {
 globalMiddlewares(app);
 await addWakeupNotfiy();
 // await redisClient.flushdb();
+
+await pingWorker();
+
+setInterval(() => {
+  pingWorker();
+}, 50 * 1000);
 
 // NOTE: DIFFERENT ROUTES
 app.use("/auth", authRouter);

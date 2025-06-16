@@ -6,11 +6,10 @@ import dateInMilli from "../../utils/javaScript/dateInMilli.js";
 import generateSecureString from "../../utils/javaScript/generateSecureString.js";
 import getAddressByID from "../../database/Address/getAddressByID.js";
 import getProductsFromIdsDB from "../../database/Products/getProductsFromIdsDB.js";
-import getExchange from "../additional/getExchange.js";
 import { setUserOrderCheckoutIntoRedis } from "../../redis/order/userCheckout.js";
 import getCountryByIdDB from "../../database/Additional/getCountryByIdDB.js";
 import getZeroStocksByProductIdsDB from "../../database/Stock/getZeroStocksByProductIdsDB.js";
-import { productPriceFromRedis } from "../../redis/Products/ProductPrice.js";
+import getProductPriceByProductIdDB from "../../database/ProductPrice/getProductPriceByProductIdDB.js";
 
 const Stripe = stripe(environment.STRIPE_SECRET_KEY);
 
@@ -61,85 +60,73 @@ const makePaymentSession = catchAsyncError(async (req, res, next) => {
     );
   }
 
-  const allExchange = await getExchange();
+  const productsPrice = await getProductPriceByProductIdDB(
+    productIds,
+    countryId
+  );
 
   const findCountry = await getCountryByIdDB(countryId);
-
-  const exchangeRate = allExchange[currency_code];
 
   const findAddress = await getAddressByID(addressId);
 
   const willBuyProducts = [];
 
-  const lineItems = await Promise.all(
-    findProducts.map(async (product) => {
-      const {
-        _id,
-        title,
-        description,
-        price,
-        thumbnail,
-        deliveredBy,
-        discountPercentage,
-      } = product;
+  const lineItems = findProducts.map((product) => {
+    const { _id, title, description, thumbnail, deliveredBy } = product;
 
-      const findQuantity = products.find((obj) => obj.id === String(_id));
+    const findQuantity = products.find((obj) => obj.id === _id.toString());
 
-      const productPrice = await productPriceFromRedis(
-        _id,
-        price,
-        currency_code,
-        discountPercentage
-      );
+    const productPrice = productsPrice.find(
+      (obj) => obj.product.toString() === _id.toString()
+    );
 
-      const { discountedPrice, priceInUSD } = productPrice;
+    const { discountedPrice, price } = productPrice;
 
-      const obj = {
-        product: product,
-        user: userId,
-        isReviewed: false,
-        orderId: CHECKOUT_ORDER_ID,
-        price: priceInUSD,
-        buyPrice: discountedPrice,
-        exchangeRate: exchangeRate,
-        country: findCountry,
-        quantity: Number(findQuantity.quantity),
-        address: findAddress,
-        isDelivered: false,
-        deliveredDate: dateInMilli(Number(deliveredBy)),
-        isCancelled: false,
-        reasonForCancelled: "",
-        isReturned: false,
-        reasonForReturned: "",
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-      };
+    const obj = {
+      product: product,
+      user: userId,
+      isReviewed: false,
+      orderId: CHECKOUT_ORDER_ID,
+      price: price,
+      buyPrice: discountedPrice,
+      currency_code: currency_code,
+      country: findCountry,
+      quantity: parseFloat(findQuantity.quantity),
+      address: findAddress,
+      isDelivered: false,
+      deliveredDate: dateInMilli(parseFloat(deliveredBy)),
+      isCancelled: false,
+      reasonForCancelled: "",
+      isReturned: false,
+      reasonForReturned: "",
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
 
-      willBuyProducts.push(obj);
+    willBuyProducts.push(obj);
 
-      return {
-        price_data: {
-          currency: currency_code,
-          unit_amount: discountedPrice * 100,
-          product_data: {
-            name: title,
-            description: description,
-            images: [thumbnail],
-          },
+    return {
+      price_data: {
+        currency: currency_code,
+        unit_amount: discountedPrice * 100,
+        product_data: {
+          name: title,
+          description: description,
+          images: [thumbnail],
         },
-        quantity: findQuantity.quantity,
-      };
-    })
-  );
+      },
+      quantity: findQuantity.quantity,
+    };
+  });
 
-  const totalDeliveryCharge = findProducts.reduce((acc, product) => {
-    return (acc += product.deliveryCharge);
+  const totalDeliveryCharge = productsPrice.reduce((acc, priceObj) => {
+    return (acc += priceObj.deliveryCharge);
   }, 0);
 
   const delieveryObj = {
     price_data: {
       currency: currency_code,
-      unit_amount: Math.round(totalDeliveryCharge * exchangeRate) * 100,
+      unit_amount: totalDeliveryCharge * 100,
       product_data: {
         name: "Delivery Charges",
         description: `Delivery charge for the above ${lineItems.length} products`,

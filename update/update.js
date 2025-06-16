@@ -4,9 +4,7 @@ import Country from "../models/CountryModel.js";
 import Product from "../models/ProductModel.js";
 import Buy from "../models/BuyModel.js";
 import Stock from "../models/StockModel.js";
-import getExchange from "../controllers/additional/getExchange.js";
 import getAllCountriesDB from "../database/Additional/getAllCountriesDB.js";
-import changePriceDiscountByExchangeRate from "../utils/javaScript/changePriceDiscountByExchangeRate.js";
 import ProductPrice from "../models/ProductPriceModel.js";
 
 // Connect to MongoDB
@@ -22,18 +20,14 @@ mongoose.connection.on("connected", async () => {
   console.log("Connected to MongoDB");
 
   try {
-    const result = await Product.updateMany(
+    const result = await Buy.updateMany(
       {},
       {
-        $unset: {
-          price: "",
-          deliveryCharge: "",
-          discountPercentage: "",
-        },
+        $set: { currency_code: "INR" },
       }
     );
 
-    console.log(result);
+    console.log("result", result);
   } catch (error) {
     console.error("Error occur in update:", error);
   } finally {

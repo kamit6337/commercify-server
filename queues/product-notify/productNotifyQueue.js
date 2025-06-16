@@ -1,8 +1,8 @@
 import { Queue } from "bullmq";
-import redisClient from "../../redis/redisClient.js";
+import redisClient, { createWorkerRedis } from "../../redis/redisClient.js";
 
 // BullMQ connection — don't use this for native Redis commands
-const bullConnection = redisClient.duplicate();
+const bullConnection = createWorkerRedis();
 
 const productNotifyQueue = new Queue("product-notify", {
   connection: bullConnection,
