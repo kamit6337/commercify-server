@@ -23,7 +23,7 @@ mongoose.connection.on("connected", async () => {
     const result = await Buy.updateMany(
       {},
       {
-        $set: { currency_code: "INR" },
+        $unset: { isReviewed: "" },
       }
     );
 

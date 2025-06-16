@@ -17,10 +17,11 @@ const getProductRatingsDB = async (productId, page) => {
 
   const ratings = await Rating.find({
     product: productId,
+    title: { $ne: null },
   })
     .populate({
       path: "user",
-      select: "_id name photo",
+      select: "_id name photo email",
     })
     .sort("-createdAt")
     .skip(skip)

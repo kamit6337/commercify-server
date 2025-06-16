@@ -23,7 +23,7 @@ const giveRating = catchAsyncError(async (req, res, next) => {
 
   const createRating = await createNewRatingDB(obj);
 
-  const updateBuy = await userBuyUpdateDB(buyId, { isReviewed: true });
+  const updateBuy = await userBuyUpdateDB(buyId, { rating: createRating._id });
 
   const createRatingData = {
     ...createRating,
@@ -35,7 +35,7 @@ const giveRating = catchAsyncError(async (req, res, next) => {
     },
   };
 
-  res.json({ buy: updateBuy, rating: createRatingData });
+  res.json(createRatingData);
 });
 
 export default giveRating;

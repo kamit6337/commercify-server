@@ -7,12 +7,13 @@ const userBuysDB = async (userId, page) => {
   const userBuys = await Buy.find({
     user: userId,
   })
-    .sort("-createdAt")
+    .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit)
     .populate("product")
     .populate("address")
     .populate("country")
+    .populate("rating")
     .lean();
 
   return userBuys;

@@ -11,9 +11,10 @@ const buySchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  isReviewed: {
-    type: Boolean,
-    default: false,
+  rating: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Rating",
+    default: null,
   },
   orderId: {
     type: String,
