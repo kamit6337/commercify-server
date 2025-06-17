@@ -57,10 +57,6 @@ io.on("connection", (socket) => {
 // NOTE: GLOBAL MIDDLEWARES
 globalMiddlewares(app);
 
-app.get("/health", (req, res) => {
-  res.json({ message: "Server Health is fine and good" });
-});
-
 await addWakeupNotfiy();
 // await redisClient.flushdb();
 
@@ -69,6 +65,10 @@ await pingWorker();
 setInterval(() => {
   pingWorker();
 }, 50 * 1000);
+
+app.get("/health", (req, res) => {
+  res.json({ message: "Server Health is fine and good" });
+});
 
 // NOTE: DIFFERENT ROUTES
 app.use("/auth", authRouter);
