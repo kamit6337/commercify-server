@@ -40,10 +40,6 @@ app.get("/", (req, res) => {
   res.json({ message: "Hello from the server" });
 });
 
-app.get("/health", (req, res) => {
-  res.json({ message: "Server Health is fine and good" });
-});
-
 // NOTE: SOCKET CONNECTION
 io.use(socketAuthMiddleware);
 
@@ -60,6 +56,11 @@ io.on("connection", (socket) => {
 
 // NOTE: GLOBAL MIDDLEWARES
 globalMiddlewares(app);
+
+app.get("/health", (req, res) => {
+  res.json({ message: "Server Health is fine and good" });
+});
+
 await addWakeupNotfiy();
 // await redisClient.flushdb();
 

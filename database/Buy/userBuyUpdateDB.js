@@ -11,7 +11,12 @@ const userBuyUpdateDB = async (buyId, obj) => {
     {
       new: true,
     }
-  ).lean();
+  )
+    .populate("product")
+    .populate("rating")
+    .populate("country")
+    .populate("address")
+    .lean();
 
   return buy;
 };

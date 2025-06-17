@@ -17,18 +17,9 @@ const updateUserCheckoutOrder = catchAsyncError(async (req, res, next) => {
 
   const updateBuy = await userBuyUpdateDB(id, obj);
 
-  // const address = await getAddressByID(updateBuy.address?.toString());
-  // const product = await getSingleProductDB(updateBuy.product?.toString());
-
-  // const buyObj = {
-  //   ...updateBuy,
-  //   product,
-  //   address,
-  // };
-
   await addOrderStatus(updateBuy._id);
 
-  io.to(updateBuy.user).emit("update-deliver", updateBuy);
+  io.to(updateBuy.user.toString()).emit("update-deliver", updateBuy);
 
   res.json(updateBuy);
 });
