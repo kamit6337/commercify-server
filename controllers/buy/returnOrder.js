@@ -12,7 +12,7 @@ const returnOrder = catchAsyncError(async (req, res, next) => {
   const obj = {
     isReturned: true,
     reasonForReturned: reason,
-    updatedAt: Date.now,
+    updatedAt: Date.now(),
   };
 
   const result = await userBuyUpdateDB(buyId, obj);

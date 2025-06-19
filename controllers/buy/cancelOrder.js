@@ -12,7 +12,7 @@ const cancelOrder = catchAsyncError(async (req, res, next) => {
   const obj = {
     isCancelled: true,
     reasonForCancelled: reason,
-    updatedAt: Date.now,
+    updatedAt: Date.now(),
   };
 
   const result = await userBuyUpdateDB(buyId, obj);
