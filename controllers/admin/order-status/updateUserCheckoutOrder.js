@@ -13,6 +13,7 @@ const updateUserCheckoutOrder = catchAsyncError(async (req, res, next) => {
   const obj = {
     isDelivered: true,
     deliveredDate: Date.now(),
+    updatedAt: Date.now,
   };
 
   const updateBuy = await userBuyUpdateDB(id, obj);
