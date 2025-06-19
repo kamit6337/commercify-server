@@ -1,4 +1,3 @@
-import { environment } from "../utils/environment.js";
 import express from "express";
 import passport from "passport";
 import signup from "../controllers/auth/signup/signup.js";
@@ -65,7 +64,7 @@ router.get(
   "/google/callback",
   passport.authenticate("google", {
     successRedirect: "/auth/login/OAuth",
-    failureRedirect: `${environment.CLIENT_URL}/oauth`,
+    failureRedirect: "/auth/login/OAuth",
   })
 );
 

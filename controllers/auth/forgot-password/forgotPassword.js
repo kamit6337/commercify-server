@@ -6,6 +6,7 @@ import generateResetToken from "../../../utils/generateResetToken.js";
 import resetPasswordLinkTemplate from "../../../utils/email/resetPasswordLinkTemplate.js";
 import { environment } from "../../../utils/environment.js";
 import { setUserIdIntoRedis } from "../../../redis/Auth/forgotPassword.js";
+import isLocalhostOrigin from "../../../utils/isLocalhostOrigin.js";
 
 const forgotPassword = catchAsyncError(async (req, res, next) => {
   const { email } = req.body;
@@ -27,7 +28,9 @@ const forgotPassword = catchAsyncError(async (req, res, next) => {
 
   const secretToken = generateResetToken();
 
-  const url = `${environment.CLIENT_URL}/newPassword?resetToken=${secretToken}`;
+  const url = `${
+    isLocalhostOrigin(req) || environment.CLIENT_URL
+  }/newPassword?resetToken=${secretToken}`;
 
   const html = resetPasswordLinkTemplate(url);
   await sendingEmail(email, "Reset Password", html);

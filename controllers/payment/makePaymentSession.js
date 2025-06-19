@@ -10,6 +10,7 @@ import { setUserOrderCheckoutIntoRedis } from "../../redis/order/userCheckout.js
 import getCountryByIdDB from "../../database/Additional/getCountryByIdDB.js";
 import getZeroStocksByProductIdsDB from "../../database/Stock/getZeroStocksByProductIdsDB.js";
 import getProductPriceByProductIdDB from "../../database/ProductPrice/getProductPriceByProductIdDB.js";
+import isLocalhostOrigin from "../../utils/isLocalhostOrigin.js";
 
 const Stripe = stripe(environment.STRIPE_SECRET_KEY);
 
@@ -154,8 +155,12 @@ const makePaymentSession = catchAsyncError(async (req, res, next) => {
   // Create a PaymentIntent with the order amount and currency
   const session = await Stripe.checkout.sessions.create({
     payment_method_types: ["card"],
-    success_url: `${environment.CLIENT_URL}/payment/success?orderId=${CHECKOUT_ORDER_ID}`,
-    cancel_url: environment.CLIENT_URL + "/payment/cancel",
+    success_url: `${
+      isLocalhostOrigin(req) || environment.CLIENT_URL
+    }/payment/success?orderId=${CHECKOUT_ORDER_ID}`,
+    cancel_url: `${
+      isLocalhostOrigin(req) || environment.CLIENT_URL
+    }/payment/cancel`,
     customer: customer.id,
     client_reference_id: userId,
     mode: "payment",

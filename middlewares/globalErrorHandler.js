@@ -1,4 +1,5 @@
 import { environment } from "../utils/environment.js";
+import isLocalhostOrigin from "../utils/isLocalhostOrigin.js";
 
 const globalErrorHandler = (err, req, res, next) => {
   err.statusCode = err.statusCode || 400;
@@ -74,7 +75,7 @@ const globalErrorHandler = (err, req, res, next) => {
   }
 
   if (err.name === "InternalOAuthError") {
-    res.redirect(environment.CLIENT_URL);
+    res.redirect(isLocalhostOrigin(req) || environment.CLIENT_URL);
     return;
   }
 

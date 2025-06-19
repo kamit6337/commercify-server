@@ -5,12 +5,13 @@ import postCreateUser from "../../../database/User/postCreateUser.js";
 import checkS3Credentials from "../../../lib/aws/checkS3Credentials.js";
 import uploadProfileImageToS3 from "../../../lib/aws/uploadProfileImageToS3.js";
 import adminEmailList from "../../../data/adminEmailList.js";
+import isLocalhostOrigin from "../../../utils/isLocalhostOrigin.js";
 
 // NOTE: LOGIN SUCCESS
 const OAuthLogin = async (req, res, next) => {
   try {
     if (!req.user) {
-      res.redirect(`${environment.CLIENT_URL}/oauth`);
+      res.redirect(`${isLocalhostOrigin(req) || environment.CLIENT_URL}/oauth`);
       return;
     }
 
@@ -45,7 +46,9 @@ const OAuthLogin = async (req, res, next) => {
       const createUser = await postCreateUser(obj);
 
       if (!createUser) {
-        res.redirect(`${environment.CLIENT_URL}/oauth`);
+        res.redirect(
+          `${isLocalhostOrigin(req) || environment.CLIENT_URL}/oauth`
+        );
         return;
       }
 
@@ -54,7 +57,11 @@ const OAuthLogin = async (req, res, next) => {
         role: createUser.role,
       });
 
-      res.redirect(`${environment.CLIENT_URL}/oauth?token=${token}`);
+      res.redirect(
+        `${
+          isLocalhostOrigin(req) || environment.CLIENT_URL
+        }/oauth?token=${token}`
+      );
       return;
     }
 
@@ -64,11 +71,13 @@ const OAuthLogin = async (req, res, next) => {
       role: findUser.role,
     });
 
-    res.redirect(`${environment.CLIENT_URL}/oauth?token=${token}`);
+    res.redirect(
+      `${isLocalhostOrigin(req) || environment.CLIENT_URL}/oauth?token=${token}`
+    );
   } catch (error) {
     console.log("Error in OAuth Login", error);
 
-    res.redirect(`${environment.CLIENT_URL}/oauth`);
+    res.redirect(`${isLocalhostOrigin(req) || environment.CLIENT_URL}/oauth`);
   }
 };
 
