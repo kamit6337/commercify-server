@@ -9,7 +9,9 @@ const getSingleBuyDB = async (buyId) => {
     _id: buyId,
   })
     .populate("product")
-    .populate("address");
+    .populate("address")
+    .populate("country")
+    .lean();
 
   return buy;
 };
