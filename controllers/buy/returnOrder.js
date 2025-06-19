@@ -1,8 +1,6 @@
 import userBuyUpdateDB from "../../database/Buy/userBuyUpdateDB.js";
-import getAdminUsers from "../../database/User/getAdminUsers.js";
 import catchAsyncError from "../../lib/catchAsyncError.js";
 import HandleGlobalError from "../../lib/HandleGlobalError.js";
-import { io } from "../../lib/socketConnect.js";
 
 const returnOrder = catchAsyncError(async (req, res, next) => {
   const { id: buyId, reason } = req.body;
@@ -14,6 +12,7 @@ const returnOrder = catchAsyncError(async (req, res, next) => {
   const obj = {
     isReturned: true,
     reasonForReturned: reason,
+    updatedAt: Date.now,
   };
 
   const result = await userBuyUpdateDB(buyId, obj);
