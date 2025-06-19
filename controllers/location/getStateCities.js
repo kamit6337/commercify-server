@@ -1,14 +1,10 @@
 import axios from "axios";
 import catchAsyncError from "../../lib/catchAsyncError.js";
 import HandleGlobalError from "../../lib/HandleGlobalError.js";
-import getLocationKey from "./getLocationKey.js";
 import {
   getStateCitiesFromRedis,
   setStateCitiesIntoRedis,
 } from "../../redis/Location/stateCities.js";
-import getStatesAndCities from "../../lib/getStatesAndCities.js";
-
-const URL = "https://www.universal-tutorial.com/api/cities/";
 
 const getStateCities = catchAsyncError(async (req, res, next) => {
   const { countrycode, state, code } = req.query;
@@ -17,15 +13,12 @@ const getStateCities = catchAsyncError(async (req, res, next) => {
     return next(new HandleGlobalError("State is not provided"));
   }
 
-  // const modifyState = state.toUpperCase();
+  const get = await getStateCitiesFromRedis(state, code);
 
-  // const get = await getStateCitiesFromRedis(state);
-
-  // if (get) {
-  //   return res.json(get);
-  // }
-
-  // const addstateToUrl = URL + modifyState;
+  if (get) {
+    res.json(get);
+    return;
+  }
 
   const options = {
     method: "GET",
@@ -44,24 +37,9 @@ const getStateCities = catchAsyncError(async (req, res, next) => {
 
   const cities = response.data;
 
-  // const key = await getLocationKey();
-  // const response = await axios.get(addstateToUrl, {
-  //   headers: {
-  //     Authorization: `Bearer ${key}`,
-  //   },
-  // });
+  await setStateCitiesIntoRedis(state, code, cities);
 
-  // const cities = response?.data;
-
-  // if (!cities?.length) {
-  //   return next(new HandleGlobalError("Issue in getting cities"));
-  // }
-
-  // const modifyCities = cities.map((city) => city.city_name);
-
-  // await setStateCitiesIntoRedis(state, cities);
-
-  return res.json(cities);
+  res.json(cities);
 });
 
 export default getStateCities;

@@ -5,10 +5,6 @@ import {
   getCountryStatesFromRedis,
   setCountryStatesIntoRedis,
 } from "../../redis/Location/countryStates.js";
-import getLocationKey from "./getLocationKey.js";
-import getStatesAndCities from "../../lib/getStatesAndCities.js";
-
-const URL = "https://www.universal-tutorial.com/api/states/";
 
 const getCountryStates = catchAsyncError(async (req, res, next) => {
   const { country, code } = req.query;
@@ -17,11 +13,12 @@ const getCountryStates = catchAsyncError(async (req, res, next) => {
     return next(new HandleGlobalError("Country is not provided"));
   }
 
-  // const get = await getCountryStatesFromRedis(country);
+  const get = await getCountryStatesFromRedis(country, code);
 
-  // if (get) {
-  //   return res.json(get);
-  // }
+  if (get) {
+    res.json(states);
+    return;
+  }
 
   const options = {
     method: "GET",
@@ -38,26 +35,9 @@ const getCountryStates = catchAsyncError(async (req, res, next) => {
   const response = await axios.request(options);
   const states = response.data;
 
-  // const addCountryToUrl = URL + modifyCountry;
-  // const key = await getLocationKey();
+  await setCountryStatesIntoRedis(country, code, states);
 
-  // const response = await axios.get(addCountryToUrl, {
-  //   headers: {
-  //     Authorization: `Bearer ${key}`,
-  //   },
-  // });
-
-  // const states = response?.data;
-
-  // if (!states?.length) {
-  //   return next(new HandleGlobalError("Issue in getting states"));
-  // }
-
-  // const modifyStates = states.map((state) => state.state_name);
-
-  // await setCountryStatesIntoRedis(country, states);
-
-  return res.json(states);
+  res.json(states);
 });
 
 export default getCountryStates;
